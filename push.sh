@@ -1,2 +1,2 @@
 #!/bin/bash
-adb push target/aarch64-linux-android/debug/bind /data/local/tmp
+adb push target/aarch64-linux-android/release/bind /data/local/tmp

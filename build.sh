@@ -1,4 +1,4 @@
 #!/bin/bash
-rm -rf target
+# rm -rf target
 
-cargo ndk -t arm64-v8a   build 
+xargo ndk -t arm64-v8a -p 24  build --features "gpu-allocator" --release -Zbuild-std 
