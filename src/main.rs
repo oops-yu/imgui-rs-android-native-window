@@ -29,11 +29,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
                 ui.button("This...is...imgui-rs!");
                 ui.separator();
-                // let mouse_pos = ui.io().mouse_pos;
-                // ui.text(format!(
-                //     "Mouse Position: ({:.1},{:.1})",
-                //     mouse_pos[0], mouse_pos[1]
-                // ));
+                let mouse_pos = ui.io().mouse_pos;
+                ui.text(format!(
+                    "Mouse Position: ({:.1},{:.1})",
+                    mouse_pos[0], mouse_pos[1]
+                ));
                 ui.separator();
                 
                 ui.text_colored([1.0,1.0,1.0,1.0],format!("fps : {}",ui.io().framerate));
@@ -43,13 +43,4 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
-// use android_native_window::{safe_create_native_window, safe_destroy_native_window, safe_greeting};
 
-// fn main() {
-//     let info = safe_greeting();
-//     println!("{:?}", info);
-
-//     let win = safe_create_native_window("test", 1080, 2400, true);
-//     println!("this win's addr is {:?}", win);
-//     safe_destroy_native_window(win);
-// }

@@ -10,7 +10,7 @@ use imgui_rs_vulkan_renderer::*;
 
 use crate::android_native_window::{self, safe_create_native_window};
 use raw_window_handle::{
-    AndroidDisplayHandle, AndroidNdkWindowHandle, HasRawDisplayHandle, HasRawWindowHandle,
+    AndroidDisplayHandle, AndroidNdkWindowHandle, 
     RawDisplayHandle, RawWindowHandle,
 };
 use std::{
