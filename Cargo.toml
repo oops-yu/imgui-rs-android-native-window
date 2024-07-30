@@ -20,6 +20,6 @@ gpu-allocator = { version = "0.26", default-features = false, features = ["vulka
 vk-mem = { version = "0.3", optional = true }
 imgui-rs-vulkan-renderer = { version="1.13.0", features = ["gpu-allocator"] }
 evdev = "0.12.2"
-# [profile.release]
-# lto = "fat"
+[profile.release]
+lto = "fat"
 
