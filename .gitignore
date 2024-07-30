@@ -1,1 +1,3 @@
 /target
+/android_native_window/build
+cargo.lock

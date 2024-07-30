@@ -14,7 +14,7 @@ use raw_window_handle::{
     RawDisplayHandle, RawWindowHandle,
 };
 use std::{
-    error::Error, ffi::{CStr, CString}, io::Read, marker::PhantomData, os::raw::c_void, time::{Duration, Instant}
+    error::Error, ffi::{CStr, CString}, io::Read, marker::PhantomData, time::{Duration, Instant}
 };
 #[cfg(feature = "gpu-allocator")]
 use {
