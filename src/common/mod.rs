@@ -8,18 +8,13 @@ use ash::{
 use imgui::*;
 use imgui_rs_vulkan_renderer::*;
 
-use crate::android_native_window::{self, safe_create_native_window};
+use crate::{android_native_window::{self, safe_create_native_window, safe_get_display_info}, touch_helper::{MousePos, Touch}};
 use raw_window_handle::{
     AndroidDisplayHandle, AndroidNdkWindowHandle, 
     RawDisplayHandle, RawWindowHandle,
 };
 use std::{
-    error::Error,
-    ffi::{CStr, CString},
-    io::Read,
-    marker::PhantomData,
-    os::raw::c_void,
-    time::Instant,
+    error::Error, ffi::{CStr, CString}, io::Read, marker::PhantomData, os::raw::c_void, time::Instant
 };
 #[cfg(feature = "gpu-allocator")]
 use {
@@ -109,7 +104,6 @@ impl<A: App> System<A> {
         let font_paths = ["/system/fonts", "/system/font", "/data/fonts"];
 
         let mut path = Path::new("/");
-        let mut filename: Option<String> = None;
 
         for tmp in &font_paths {
             if Path::new(tmp).exists() {
@@ -156,7 +150,8 @@ impl<A: App> System<A> {
         } else {
             display_info.height as f32
         };
-        imgui.io_mut().display_size = [res, res];
+
+        imgui.io_mut().display_size = [res as f32, res as f32];
 
         #[cfg(feature = "gpu-allocator")]
         let renderer = {
@@ -271,11 +266,26 @@ impl<A: App> System<A> {
         let mut last_frame = Instant::now();
         let mut run = true;
         let mut dirty_swapchain = false;
+
+        let mut touch = Touch::new();
+        let mouse_pos = std::sync::Arc::new(std::sync::Mutex::new(MousePos::new()));
         //test
+        let mouse_pos_t =std::sync::Arc::clone(&mouse_pos);
+        std::thread::spawn(move ||{
+            touch.refresh_current_state(mouse_pos_t);
+        });
+        
+        let renderer = &mut renderer;
         loop {
-            let renderer = &mut renderer;
             let now = Instant::now();
             imgui.io_mut().update_delta_time(now - last_frame);
+            
+            // update mouse position
+            if let Ok(mouse_info) = mouse_pos.try_lock(){
+                
+                imgui.io_mut().add_mouse_pos_event([mouse_info.pos.0,mouse_info.pos.1]);
+                imgui.io_mut().add_mouse_button_event(MouseButton::Left, mouse_info.is_down);
+            }
 
             last_frame = now;
             if dirty_swapchain {
@@ -304,9 +314,7 @@ impl<A: App> System<A> {
             let draw_data = imgui.render();
 
             if !run {
-                // elwt.exit();
                 break;
-                // return;
             }
 
             unsafe {
@@ -328,8 +336,8 @@ impl<A: App> System<A> {
             let image_index = match next_image_result {
                 Ok((image_index, _)) => image_index,
                 Err(vk::Result::ERROR_OUT_OF_DATE_KHR) => {
+                    log::debug!("333");
                     dirty_swapchain = true;
-                    // return;
                     continue;
                 }
                 Err(error) => panic!("Error while acquiring next image. Cause: {}", error),
@@ -408,8 +416,7 @@ impl<A: App> System<A> {
 pub struct VulkanContext {
     _entry: Entry,
     pub instance: Instance,
-    debug_utils: DebugUtils,
-    debug_utils_messenger: vk::DebugUtilsMessengerEXT,
+
     surface: Surface,
     surface_khr: vk::SurfaceKHR,
     pub physical_device: vk::PhysicalDevice,
@@ -425,7 +432,7 @@ impl VulkanContext {
     pub fn new(name: &str) -> Result<Self, Box<dyn Error>> {
         // Vulkan instance
         let entry = Entry::linked();
-        let (instance, debug_utils, debug_utils_messenger) = create_vulkan_instance(&entry, name)?;
+        let instance = create_vulkan_instance(&entry, name)?;
 
         // Vulkan surface
         let surface = Surface::new(&entry, &instance);
@@ -477,8 +484,6 @@ impl VulkanContext {
         Ok(Self {
             _entry: entry,
             instance,
-            debug_utils,
-            debug_utils_messenger,
             surface,
             surface_khr,
             physical_device,
@@ -499,8 +504,7 @@ impl Drop for VulkanContext {
             self.device.destroy_command_pool(self.command_pool, None);
             self.device.destroy_device(None);
             self.surface.destroy_surface(self.surface_khr, None);
-            self.debug_utils
-                .destroy_debug_utils_messenger(self.debug_utils_messenger, None);
+            
             self.instance.destroy_instance(None);
         }
     }
@@ -590,7 +594,7 @@ impl Swapchain {
 fn create_vulkan_instance(
     entry: &Entry,
     title: &str,
-) -> Result<(Instance, DebugUtils, vk::DebugUtilsMessengerEXT), Box<dyn Error>> {
+) -> Result<Instance, Box<dyn Error>> {
     log::debug!("Creating vulkan instance");
     // Vulkan instance
     let app_name = CString::new(title)?;
@@ -607,7 +611,6 @@ fn create_vulkan_instance(
     )?
     .to_vec();
     extension_names.push(DebugUtils::name().as_ptr());
-
     let instance_create_info = vk::InstanceCreateInfo::builder()
         .application_info(&app_info)
         .enabled_extension_names(&extension_names);
@@ -615,24 +618,10 @@ fn create_vulkan_instance(
     let instance = unsafe { entry.create_instance(&instance_create_info, None)? };
 
     // Vulkan debug report
-    let create_info = vk::DebugUtilsMessengerCreateInfoEXT::builder()
-        .flags(vk::DebugUtilsMessengerCreateFlagsEXT::empty())
-        .message_severity(
-            vk::DebugUtilsMessageSeverityFlagsEXT::INFO
-                | vk::DebugUtilsMessageSeverityFlagsEXT::WARNING
-                | vk::DebugUtilsMessageSeverityFlagsEXT::ERROR,
-        )
-        .message_type(
-            vk::DebugUtilsMessageTypeFlagsEXT::GENERAL
-                | vk::DebugUtilsMessageTypeFlagsEXT::PERFORMANCE
-                | vk::DebugUtilsMessageTypeFlagsEXT::VALIDATION,
-        )
-        .pfn_user_callback(Some(vulkan_debug_callback));
-    let debug_utils = DebugUtils::new(entry, &instance);
-    let debug_utils_messenger =
-        unsafe { debug_utils.create_debug_utils_messenger(&create_info, None)? };
+    
+    
 
-    Ok((instance, debug_utils, debug_utils_messenger))
+    Ok(instance)
 }
 
 unsafe extern "system" fn vulkan_debug_callback(
@@ -841,17 +830,18 @@ fn create_vulkan_swapchain(
 
     // Swapchain extent
     let extent = {
-        if capabilities.current_extent.width != std::u32::MAX {
-            capabilities.current_extent
-        } else {
-            let min = capabilities.min_image_extent;
+        // if capabilities.current_extent.width != std::u32::MAX {
+        //     capabilities.current_extent
+        // } else {
+        {    let min = capabilities.min_image_extent;
             let max = capabilities.max_image_extent;
-            let width = WIDTH.min(max.width).max(min.width);
-            let height = HEIGHT.min(max.height).max(min.height);
-            vk::Extent2D { width, height }
+            let display_info = safe_get_display_info();
+            let res = if display_info.width > display_info.height { display_info.width } else { display_info.height };
+
+            vk::Extent2D { width:res as u32, height:res as u32 }
         }
     };
-    log::debug!("Swapchain extent: {extent:?}");
+    log::debug!("Swapchain extent1: {extent:?}");
 
     // Swapchain image count
     let image_count = capabilities.min_image_count;
@@ -879,7 +869,7 @@ fn create_vulkan_swapchain(
         } else {
             builder.image_sharing_mode(vk::SharingMode::EXCLUSIVE)
         };
-        log::info!("SurfaceCapabilities:{:?}", capabilities);
+        log::info!("SurfaceCapabilities:{:?}", capabilities.current_transform);
         builder
             .pre_transform(vk::SurfaceTransformFlagsKHR::IDENTITY)
             .composite_alpha(vk::CompositeAlphaFlagsKHR::OPAQUE)

@@ -1,6 +1,7 @@
 // src/bindings.rs
 pub mod android_native_window;
 pub mod common;
+pub mod touch_helper;
 use common::*;
 use imgui::*;
 use simple_logger::SimpleLogger;
@@ -35,7 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     mouse_pos[0], mouse_pos[1]
                 ));
                 ui.separator();
-                
+
                 ui.text_colored([1.0,1.0,1.0,1.0],format!("fps : {}",ui.io().framerate));
                 
             });
