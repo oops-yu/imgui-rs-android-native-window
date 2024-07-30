@@ -633,23 +633,6 @@ fn create_vulkan_instance(
     Ok(instance)
 }
 
-unsafe extern "system" fn vulkan_debug_callback(
-    flag: vk::DebugUtilsMessageSeverityFlagsEXT,
-    typ: vk::DebugUtilsMessageTypeFlagsEXT,
-    p_callback_data: *const vk::DebugUtilsMessengerCallbackDataEXT,
-    _: *mut c_void,
-) -> vk::Bool32 {
-    use vk::DebugUtilsMessageSeverityFlagsEXT as Flag;
-
-    let message = CStr::from_ptr((*p_callback_data).p_message);
-    match flag {
-        Flag::VERBOSE => log::debug!("{typ:?} - {message:?}"),
-        Flag::INFO => log::info!("{typ:?} - {message:?}"),
-        Flag::WARNING => log::warn!("{typ:?} - {message:?}"),
-        _ => log::error!("{typ:?} - {message:?}"),
-    }
-    vk::FALSE
-}
 
 fn create_vulkan_physical_device_and_get_graphics_and_present_qs_indices(
     instance: &Instance,
