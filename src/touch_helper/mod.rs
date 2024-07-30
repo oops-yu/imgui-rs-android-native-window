@@ -18,11 +18,14 @@ pub struct Touch {
     least_finger_idx: usize,
     scale_x: f32,
     scale_y: f32,
+    screen_width:f32,
+    screen_height:f32,
+    realtime_orientation_cache:u8
 }
 
 
 impl Touch {
-    pub fn new() -> Self {
+    pub fn new(screen_width:f32,screen_height:f32) -> Self {
         let mut i = 0;
         let device: Option<Device> = loop {
             if let Ok(dev) = Device::open(format!("/dev/input/event{i}")) {
@@ -42,8 +45,8 @@ impl Touch {
         let infos = device.get_abs_state().expect("can not get abs info");
         let phy_win_x = infos[0].maximum as f32;
         let phy_win_y = infos[1].maximum as f32;
-        let scale_x = phy_win_x / 1080.0;
-        let scale_y = phy_win_y / 2400.0;
+        let scale_x = phy_win_x / screen_width;
+        let scale_y = phy_win_y / screen_height;
         let mut finger_states: Vec<FingerState> = vec![];
 
         finger_states.resize_with(10, || FingerState {
@@ -52,9 +55,9 @@ impl Touch {
         });
 
         let  least_finger_idx: usize = 0;
-        Self { device, finger_states , least_finger_idx, scale_x, scale_y }
+        Self { device, finger_states , least_finger_idx, scale_x, scale_y ,realtime_orientation_cache:1,screen_width,screen_height}
     }
-    pub fn refresh_current_state(&mut self,state:std::sync::Arc<std::sync::Mutex<MousePos>>){
+    pub fn refresh_current_state(&mut self,state:std::sync::Arc<std::sync::Mutex<MousePos>>,realtime_orientation :std::sync::Arc<std::sync::Mutex<u8>>){
         loop {
             // 读取输入事件
             for ev in self.device.fetch_events().expect("fetch_events failed!") {
@@ -71,10 +74,10 @@ impl Touch {
                             }
                         }
                         AbsoluteAxisType::ABS_MT_POSITION_X => {
-                            self.finger_states[self.least_finger_idx].pos.0 = ev.value() as f32 / self.scale_x;
+                            self.finger_states[self.least_finger_idx].pos.0 = ev.value() as f32 / self.scale_x ;
                         }
                         AbsoluteAxisType::ABS_MT_POSITION_Y => {
-                            self.finger_states[self.least_finger_idx].pos.1 = ev.value() as f32 / self.scale_y;
+                            self.finger_states[self.least_finger_idx].pos.1 = ev.value() as f32 /self.scale_y;
                         }
                         _ => {}
                     },
@@ -83,12 +86,14 @@ impl Touch {
                             if self.finger_states[self.least_finger_idx].is_down {
                                 
                                 if let Ok(mut pos) = state.try_lock(){
-                                    //println!("update finger state:{:?}", self.finger_states[self.least_finger_idx]);
-                                    (*pos) = self.finger_states[self.least_finger_idx].clone();
+                                    if let Ok(orientation) = realtime_orientation.try_lock(){
+                                        self.realtime_orientation_cache = *orientation;
+                                    }
+                                    (*pos) = Self::touch_2_screen(self.screen_width,self.screen_height,self.realtime_orientation_cache,self.finger_states[self.least_finger_idx].clone());
                                 }
                             } else {
                                 if let Ok(mut pos) = state.try_lock(){
-                                    //println!("update finger state:{:?}", self.finger_states[self.least_finger_idx]);
+                                   
                                     (*pos).is_down = self.finger_states[self.least_finger_idx].is_down;
                                 }
                             }
@@ -101,6 +106,25 @@ impl Touch {
                 }
             }
         }
+    }
+
+    fn touch_2_screen(screen_width:f32,screen_height:f32,realtime_orientation :u8,phy_mouse_pos:MousePos)->MousePos{
+        let mut phy_mouse_pos = phy_mouse_pos;
+        let x = phy_mouse_pos.pos.0.clone();
+        let y = phy_mouse_pos.pos.1.clone();
+        match realtime_orientation {
+            1=>{
+                phy_mouse_pos.pos.0 = y;
+                phy_mouse_pos.pos.1 = screen_width - x;
+            }
+            3=>{
+                phy_mouse_pos.pos.1 =  x;
+                phy_mouse_pos.pos.0 = screen_height - y;
+                
+            }
+            _=>{}
+        }
+        phy_mouse_pos
     }
 }
 

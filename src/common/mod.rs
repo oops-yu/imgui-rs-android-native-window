@@ -14,7 +14,7 @@ use raw_window_handle::{
     RawDisplayHandle, RawWindowHandle,
 };
 use std::{
-    error::Error, ffi::{CStr, CString}, io::Read, marker::PhantomData, os::raw::c_void, time::Instant
+    error::Error, ffi::{CStr, CString}, io::Read, marker::PhantomData, os::raw::c_void, time::{Duration, Instant}
 };
 #[cfg(feature = "gpu-allocator")]
 use {
@@ -267,12 +267,25 @@ impl<A: App> System<A> {
         let mut run = true;
         let mut dirty_swapchain = false;
 
-        let mut touch = Touch::new();
+        let mut touch = Touch::new(1080.0,2400.0);
+        let realtime_orientation = std::sync::Arc::new(std::sync::Mutex::new(1 as u8));
+
+        let realtime_orientation_clone = std::sync::Arc::clone(&realtime_orientation);
+        //每1s更新屏幕的旋转方向
+        std::thread::spawn(move||{
+            loop{
+                if let Ok(mut ori) = realtime_orientation.try_lock(){
+                    let info = safe_get_display_info();
+                    *ori = info.orientation as u8;
+                }
+                
+                std::thread::sleep(Duration::from_secs(1));
+            }
+        });
         let mouse_pos = std::sync::Arc::new(std::sync::Mutex::new(MousePos::new()));
-        //test
-        let mouse_pos_t =std::sync::Arc::clone(&mouse_pos);
+        let mouse_pos_clone =std::sync::Arc::clone(&mouse_pos);
         std::thread::spawn(move ||{
-            touch.refresh_current_state(mouse_pos_t);
+            touch.refresh_current_state(mouse_pos_clone,realtime_orientation_clone);
         });
         
         let renderer = &mut renderer;
@@ -306,11 +319,10 @@ impl<A: App> System<A> {
 
             // Generate UI
             // platform
-            //     .prepare_frame(imgui.io_mut(), &window)
-            //     .expect("Failed to prepare frame");
+
             let ui = imgui.frame();
             ui_builder(&mut run, ui, &mut app);
-            //platform.prepare_render(ui, &window);
+
             let draw_data = imgui.render();
 
             if !run {
@@ -616,9 +628,6 @@ fn create_vulkan_instance(
         .enabled_extension_names(&extension_names);
 
     let instance = unsafe { entry.create_instance(&instance_create_info, None)? };
-
-    // Vulkan debug report
-    
     
 
     Ok(instance)
@@ -830,11 +839,11 @@ fn create_vulkan_swapchain(
 
     // Swapchain extent
     let extent = {
-        // if capabilities.current_extent.width != std::u32::MAX {
-        //     capabilities.current_extent
-        // } else {
-        {    let min = capabilities.min_image_extent;
-            let max = capabilities.max_image_extent;
+        if capabilities.current_extent.width != std::u32::MAX {
+            capabilities.current_extent
+        } else {
+            // let min = capabilities.min_image_extent;
+            // let max = capabilities.max_image_extent;
             let display_info = safe_get_display_info();
             let res = if display_info.width > display_info.height { display_info.width } else { display_info.height };
 
