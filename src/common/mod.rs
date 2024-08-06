@@ -8,13 +8,19 @@ use ash::{
 use imgui::*;
 use imgui_rs_vulkan_renderer::*;
 
-use crate::{android_native_window::{self, safe_create_native_window, safe_get_display_info}, touch_helper::{MousePos, Touch}};
+use crate::{
+    android_native_window::{self, safe_create_native_window, safe_get_display_info},
+    touch_helper::{MousePos, Touch},
+};
 use raw_window_handle::{
-    AndroidDisplayHandle, AndroidNdkWindowHandle, 
-    RawDisplayHandle, RawWindowHandle,
+    AndroidDisplayHandle, AndroidNdkWindowHandle, RawDisplayHandle, RawWindowHandle,
 };
 use std::{
-    error::Error, ffi::{CStr, CString}, io::Read, marker::PhantomData, time::{Duration, Instant}
+    error::Error,
+    ffi::{CStr, CString},
+    io::Read,
+    marker::PhantomData,
+    time::{Duration, Instant},
 };
 #[cfg(feature = "gpu-allocator")]
 use {
@@ -267,37 +273,38 @@ impl<A: App> System<A> {
         let mut run = true;
         let mut dirty_swapchain = false;
 
-        let mut touch = Touch::new(1080.0,2400.0);
+        let mut touch = Touch::new(1080.0, 2400.0);
         let realtime_orientation = std::sync::Arc::new(std::sync::Mutex::new(1 as u8));
 
         let realtime_orientation_clone = std::sync::Arc::clone(&realtime_orientation);
         //每1s更新屏幕的旋转方向
-        std::thread::spawn(move||{
-            loop{
-                if let Ok(mut ori) = realtime_orientation.try_lock(){
-                    let info = safe_get_display_info();
-                    *ori = info.orientation as u8;
-                }
-                
-                std::thread::sleep(Duration::from_secs(1));
+        std::thread::spawn(move || loop {
+            if let Ok(mut ori) = realtime_orientation.try_lock() {
+                let info = safe_get_display_info();
+                *ori = info.orientation as u8;
             }
+
+            std::thread::sleep(Duration::from_secs(1));
         });
         let mouse_pos = std::sync::Arc::new(std::sync::Mutex::new(MousePos::new()));
-        let mouse_pos_clone =std::sync::Arc::clone(&mouse_pos);
-        std::thread::spawn(move ||{
-            touch.refresh_current_state(mouse_pos_clone,realtime_orientation_clone);
+        let mouse_pos_clone = std::sync::Arc::clone(&mouse_pos);
+        std::thread::spawn(move || {
+            touch.refresh_current_state(mouse_pos_clone, realtime_orientation_clone);
         });
-        
+
         let renderer = &mut renderer;
         loop {
             let now = Instant::now();
             imgui.io_mut().update_delta_time(now - last_frame);
-            
+
             // update mouse position
-            if let Ok(mouse_info) = mouse_pos.try_lock(){
-                
-                imgui.io_mut().add_mouse_pos_event([mouse_info.pos.0,mouse_info.pos.1]);
-                imgui.io_mut().add_mouse_button_event(MouseButton::Left, mouse_info.is_down);
+            if let Ok(mouse_info) = mouse_pos.try_lock() {
+                imgui
+                    .io_mut()
+                    .add_mouse_pos_event([mouse_info.pos.0, mouse_info.pos.1]);
+                imgui
+                    .io_mut()
+                    .add_mouse_button_event(MouseButton::Left, mouse_info.is_down);
             }
 
             last_frame = now;
@@ -516,7 +523,7 @@ impl Drop for VulkanContext {
             self.device.destroy_command_pool(self.command_pool, None);
             self.device.destroy_device(None);
             self.surface.destroy_surface(self.surface_khr, None);
-            
+
             self.instance.destroy_instance(None);
         }
     }
@@ -603,10 +610,7 @@ impl Swapchain {
     }
 }
 
-fn create_vulkan_instance(
-    entry: &Entry,
-    title: &str,
-) -> Result<Instance, Box<dyn Error>> {
+fn create_vulkan_instance(entry: &Entry, title: &str) -> Result<Instance, Box<dyn Error>> {
     log::debug!("Creating vulkan instance");
     // Vulkan instance
     let app_name = CString::new(title)?;
@@ -628,11 +632,9 @@ fn create_vulkan_instance(
         .enabled_extension_names(&extension_names);
 
     let instance = unsafe { entry.create_instance(&instance_create_info, None)? };
-    
 
     Ok(instance)
 }
-
 
 fn create_vulkan_physical_device_and_get_graphics_and_present_qs_indices(
     instance: &Instance,
@@ -828,9 +830,16 @@ fn create_vulkan_swapchain(
             // let min = capabilities.min_image_extent;
             // let max = capabilities.max_image_extent;
             let display_info = safe_get_display_info();
-            let res = if display_info.width > display_info.height { display_info.width } else { display_info.height };
+            let res = if display_info.width > display_info.height {
+                display_info.width
+            } else {
+                display_info.height
+            };
 
-            vk::Extent2D { width:res as u32, height:res as u32 }
+            vk::Extent2D {
+                width: res as u32,
+                height: res as u32,
+            }
         }
     };
     log::debug!("Swapchain extent1: {extent:?}");

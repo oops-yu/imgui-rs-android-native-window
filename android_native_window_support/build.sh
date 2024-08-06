@@ -10,6 +10,7 @@ cmake   -G "Unix Makefiles" \
         -DANDROID_ABI="arm64-v8a" \
         -DANDROID_NDK="$ANDROID_NDK_HOME" \
         -DANDROID_PLATFORM="android-24" \
+        -DANDROID_STL="c++_static"\
         -DCMAKE_SYSTEM_NAME=Android \
         -DCMAKE_BUILD_TYPE="Release" \
         -B build\

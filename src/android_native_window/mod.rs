@@ -27,8 +27,7 @@ pub fn safe_greeting() -> DisPlayInfo {
 pub fn safe_get_display_info() -> DisPlayInfo {
     unsafe {
         {
-           get_display_info()
-           
+            get_display_info()
         }
     }
 }
