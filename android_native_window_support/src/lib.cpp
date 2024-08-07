@@ -144,7 +144,11 @@ namespace android
 
             Functionals(const SymbolMethod &symbolMethod)
             {
-                symbolMethod.Open("/system/lib64/libandroid.so",RTLD_NOW);
+                void *handle = symbolMethod.Open("/system/lib64/libandroid.so",RTLD_NOW);
+                if(!handle){
+                    fprintf(stderr, "%s\n", dlerror());
+                    exit(-1) ;
+                }
                 std::string systemVersionString(128, 0);
 
                 systemVersionString.resize(__system_property_get("ro.build.version.release", systemVersionString.data()));

@@ -8,11 +8,4 @@ fn main() {
 
 fn android() {
     println!("cargo:rustc-link-search=native=./cxx_lib");
-    //  println!("cargo:rustc-link-lib=dylib=c++_shared");
-    //println!("cargo:rustc-link-lib=static=stdc++");
-    println!("cargo:rustc-link-lib=static=c++abi");
-    println!("cargo:rustc-link-lib=static=c++_static");
-
-    //println!("cargo:rustc-cfg=disable_exceptions");
-    //  println!("cargo:rustc-link-flags=-Wl,--fno-exceptions");
 }

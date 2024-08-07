@@ -14,7 +14,7 @@ cmake   -G "Unix Makefiles" \
         -DCMAKE_SYSTEM_NAME=Android \
         -DCMAKE_BUILD_TYPE="Release" \
         -B build\
-        -DCMAKE_INSTALL_PREFIX=./ \
+        -DCMAKE_INSTALL_PREFIX=../ \
         .
 
 cmake --build build

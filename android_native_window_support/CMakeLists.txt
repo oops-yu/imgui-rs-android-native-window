@@ -12,3 +12,6 @@ file(GLOB SOURCE_FILES  src/*.c* src/*/*.c*)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
+install(TARGETS ${PROJECT_NAME}
+        LIBRARY DESTINATION cxx_lib
+        ARCHIVE DESTINATION cxx_lib)
