@@ -33,8 +33,7 @@ use {
     vk_mem::{Allocator, AllocatorCreateInfo},
 };
 
-const WIDTH: u32 = 1024;
-const HEIGHT: u32 = 768;
+
 
 pub trait App {
     fn destroy(&mut self, context: &VulkanContext);
@@ -272,8 +271,8 @@ impl<A: App> System<A> {
         let mut last_frame = Instant::now();
         let mut run = true;
         let mut dirty_swapchain = false;
-
-        let mut touch = Touch::new(1080.0, 2400.0);
+        let android_native_window::DisPlayInfo{width,height,..} = safe_get_display_info();
+        let mut touch = Touch::new(width as f32, height as f32);
         let realtime_orientation = std::sync::Arc::new(std::sync::Mutex::new(1 as u8));
 
         let realtime_orientation_clone = std::sync::Arc::clone(&realtime_orientation);
@@ -309,7 +308,7 @@ impl<A: App> System<A> {
 
             last_frame = now;
             if dirty_swapchain {
-                let (width, height) = (HEIGHT, WIDTH);
+                let (width, height) = (-1, -1);
                 if width > 0 && height > 0 {
                     swapchain
                         .recreate(&vulkan_context)

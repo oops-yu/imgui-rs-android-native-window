@@ -1,3 +1,4 @@
 /target
-/android_native_window/build
+/android_native_window_support/build
 Cargo.lock
+.vscode
