@@ -10,11 +10,13 @@ use std::error::Error;
 const APP_NAME: &str = "hello world";
 
 fn main() -> Result<(), Box<dyn Error>> {
+    #[cfg(debug_assertions)]
     SimpleLogger::new().init()?;
     let mut value = 0;
     let choices = ["test test this is 1", "test test this is 2"];
-    System::new(APP_NAME)?.run((), move |_, ui, _| {
+    System::new(APP_NAME)?.run((), move |run, ui, frame_rate| {
         ui.window("HEllo world")
+            .opened(run)
             .size([440.0, 320.0], Condition::FirstUseEver)
             .build(|| {
                 // let info = android_native_window::safe_get_display_info();
@@ -34,8 +36,20 @@ fn main() -> Result<(), Box<dyn Error>> {
                     "Mouse Position: ({:.1},{:.1})",
                     mouse_pos[0], mouse_pos[1]
                 ));
-                ui.separator();
 
+                ui.separator();
+                ui.text("chose:");
+                ui.same_line();
+                ui.radio_button("30", frame_rate, 30.0);
+                ui.same_line();
+                ui.radio_button("60", frame_rate, 60.0);
+                ui.same_line();
+                ui.radio_button("90", frame_rate, 90.0);
+                ui.same_line();
+                ui.radio_button("120", frame_rate, 120.0);
+                ui.same_line();
+
+                ui.separator();
                 ui.text_colored([1.0, 1.0, 1.0, 1.0], format!("fps : {}", ui.io().framerate));
             });
     })?;

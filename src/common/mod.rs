@@ -33,8 +33,6 @@ use {
     vk_mem::{Allocator, AllocatorCreateInfo},
 };
 
-
-
 pub trait App {
     fn destroy(&mut self, context: &VulkanContext);
 }
@@ -60,7 +58,6 @@ impl<A: App> System<A> {
     pub fn new(title: &str) -> Result<Self, Box<dyn Error>> {
         log::info!("Create application");
         // Setup window
-        // let (window, event_loop) = create_window(title)?;
 
         let vulkan_context = VulkanContext::new(title)?;
 
@@ -252,7 +249,7 @@ impl<A: App> System<A> {
 
     pub fn run<B>(self, mut app: A, mut ui_builder: B) -> Result<(), Box<dyn Error>>
     where
-        B: FnMut(&mut bool, &mut Ui, &mut A) + 'static,
+        B: FnMut(&mut bool, &mut Ui, &mut f32) + 'static,
     {
         log::info!("Starting application");
 
@@ -270,8 +267,9 @@ impl<A: App> System<A> {
 
         let mut last_frame = Instant::now();
         let mut run = true;
+        let mut frame_rate: f32 = 60.0;
         let mut dirty_swapchain = false;
-        let android_native_window::DisPlayInfo{width,height,..} = safe_get_display_info();
+        let android_native_window::DisPlayInfo { width, height, .. } = safe_get_display_info();
         let mut touch = Touch::new(width as f32, height as f32);
         let realtime_orientation = std::sync::Arc::new(std::sync::Mutex::new(1 as u8));
 
@@ -295,6 +293,7 @@ impl<A: App> System<A> {
         loop {
             let now = Instant::now();
             imgui.io_mut().update_delta_time(now - last_frame);
+            last_frame = now;
 
             // update mouse position
             if let Ok(mouse_info) = mouse_pos.try_lock() {
@@ -306,7 +305,6 @@ impl<A: App> System<A> {
                     .add_mouse_button_event(MouseButton::Left, mouse_info.is_down);
             }
 
-            last_frame = now;
             if dirty_swapchain {
                 let (width, height) = (-1, -1);
                 if width > 0 && height > 0 {
@@ -327,13 +325,13 @@ impl<A: App> System<A> {
             // platform
 
             let ui = imgui.frame();
-            ui_builder(&mut run, ui, &mut app);
-
-            let draw_data = imgui.render();
+            ui_builder(&mut run, ui, &mut frame_rate);
 
             if !run {
                 break;
             }
+
+            let draw_data = imgui.render();
 
             unsafe {
                 vulkan_context
@@ -422,6 +420,10 @@ impl<A: App> System<A> {
                 }
                 Err(error) => panic!("Failed to present queue. Cause: {}", error),
                 _ => {}
+            }
+            let render_time = 1.0 / frame_rate - (Instant::now() - last_frame).as_secs_f32();
+            if render_time > 0.0 {
+                std::thread::sleep(Duration::from_secs_f32(render_time));
             }
         }
 
@@ -807,7 +809,7 @@ fn create_vulkan_swapchain(
         if present_modes.contains(&vk::PresentModeKHR::IMMEDIATE) {
             vk::PresentModeKHR::IMMEDIATE
         } else {
-            vk::PresentModeKHR::FIFO
+            vk::PresentModeKHR::MAILBOX
         }
     };
     log::debug!("Swapchain present mode: {present_mode:?}");

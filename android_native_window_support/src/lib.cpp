@@ -1,12 +1,16 @@
 
 
 #include "lib.h"
-
+#ifdef DEBUG
+#define LOG(fmt,...) printf(fmt,...)
+#else
+#define LOG(fmt,...) printf("")
+#endif
 #define ResolveMethod(ClassName, MethodName, Handle, MethodSignature)                                                              \
     ClassName##__##MethodName = reinterpret_cast<decltype(ClassName##__##MethodName)>(symbolMethod.Find(Handle, MethodSignature)); \
     if (nullptr == ClassName##__##MethodName)                                                                                      \
     {                                                                                                                              \
-        printf("[-] Method not found: %s -> %s::%s\n", MethodSignature, #ClassName, #MethodName);                                  \
+        LOG("[-] Method not found: %s -> %s::%s\n", MethodSignature, #ClassName, #MethodName);                                  \
         fflush(stdout);                                                                                                            \
     }
 
@@ -146,7 +150,7 @@ namespace android
             {
                 void *handle = symbolMethod.Open("/system/lib64/libandroid.so",RTLD_NOW);
                 if(!handle){
-                    fprintf(stderr, "%s\n", dlerror());
+                    printf("cannot open libandroid.so\n");
                     exit(-1) ;
                 }
                 std::string systemVersionString(128, 0);
@@ -157,7 +161,7 @@ namespace android
 
                 if (9 > systemVersion)
                 {
-                    printf("[-] Unsupported system version: %zu", systemVersion);
+                    LOG("[-] Unsupported system version: %zu", systemVersion);
                     return;
                 }
 
@@ -242,12 +246,12 @@ namespace android
                         *patchTo = symbolMethod.Find(libgui, signature);
                         if (nullptr != *patchTo)
                         {
-                            printf("[-] Patch method  found: %s\n", signature);
+                            LOG("[-] Patch method  found: %s\n", signature);
                             fflush(stdout);
                             continue;
                         }
 
-                        printf("[-] Patch method not found: %s\n", signature);
+                        LOG("[-] Patch method not found: %s\n", signature);
                         fflush(stdout);
                     }
                 }
@@ -575,10 +579,9 @@ namespace android
 
         ANativeWindow *create_native_window(const char *name, int32_t width = -1, int32_t height = -1, bool skipScrenshot_ = false)
         {
-            printf("name:%sw:%d,height:%d,skip:%d\n",name,width,height,skipScrenshot_);
-            fflush(stdout);
+            
             auto &surfaceComposerClient = GetComposerInstance();
-            fflush(stdout);
+
             while (-1 == width || -1 == height)
             {
                 detail::ui::DisplayState displayInfo{};
@@ -615,3 +618,4 @@ namespace android
 }
 
 #undef ResolveMethod
+#undef LOG

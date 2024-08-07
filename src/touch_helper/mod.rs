@@ -26,7 +26,7 @@ pub struct Touch {
 }
 
 impl Touch {
-    pub fn new(mut screen_width: f32,mut  screen_height: f32) -> Self {
+    pub fn new(mut screen_width: f32, mut screen_height: f32) -> Self {
         let mut i = 0;
         let device: Option<Device> = loop {
             if let Ok(dev) = Device::open(format!("/dev/input/event{i}")) {
@@ -42,12 +42,12 @@ impl Touch {
 
         let device = device.unwrap_or_else(|| panic!("can not find touch in your device"));
         // 打印设备名称
-        println!("found touch: {}", device.name().unwrap_or("Unknown"));
+        log::info!("found touch: {}", device.name().unwrap_or("Unknown"));
         let infos = device.get_abs_state().expect("can not get abs info");
         let phy_win_x = infos[0].maximum as f32;
         let phy_win_y = infos[1].maximum as f32;
         // 解决横屏的情况
-        if screen_height<screen_width {
+        if screen_height < screen_width {
             std::mem::swap(&mut screen_height, &mut screen_width)
         }
         let scale_x = phy_win_x / screen_width;
