@@ -23,5 +23,6 @@ evdev = "0.12.2"
 
 [profile.release]
 panic = 'abort'
+lto = 'fat'
 
 

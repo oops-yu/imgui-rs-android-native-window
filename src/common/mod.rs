@@ -247,7 +247,7 @@ impl<A: App> System<A> {
         Ok(())
     }
 
-    pub fn run<B>(self, mut app: A, mut ui_builder: B) -> Result<(), Box<dyn Error>>
+    pub fn run<B>(self, _app: A, mut ui_builder: B) -> Result<(), Box<dyn Error>>
     where
         B: FnMut(&mut bool, &mut Ui, &mut f32) + 'static,
     {

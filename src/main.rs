@@ -4,13 +4,14 @@ pub mod common;
 pub mod touch_helper;
 use common::*;
 use imgui::*;
-use simple_logger::SimpleLogger;
+
 use std::error::Error;
 
 const APP_NAME: &str = "hello world";
 
 fn main() -> Result<(), Box<dyn Error>> {
     #[cfg(debug_assertions)]
+    use simple_logger::SimpleLogger;
     SimpleLogger::new().init()?;
     let mut value = 0;
     let choices = ["test test this is 1", "test test this is 2"];
