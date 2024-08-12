@@ -1,0 +1,32 @@
+#[allow(unused_imports)]
+use super::data_types::*;
+pub struct GameData {
+    pub fov: f32,          // 自身fov
+    pub matrix: [f32; 16], // 游戏矩阵
+    pub firing: i32,       // 开火判断
+    pub aiming: i32,       // 开镜判断
+    pub local_weapon: i32, // 自身手持
+    pub angle: f32,
+    pub local_position: Vec3,
+    pub players: Vec<Player>,
+    pub supplies: Vec<Supply>,
+}
+impl Default for GameData {
+    fn default() -> Self {
+        Self {
+            fov: 0.0,
+            matrix: [0.0; 16],
+            firing: 0,
+            aiming: 0,
+            local_weapon: 0,
+            angle: 0.0,
+            local_position: Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            players: Vec::with_capacity(100),   // 使用默认值初始化
+            supplies: Vec::with_capacity(1000), // 初始化 Vec 具有 1000 的容量
+        }
+    }
+}
