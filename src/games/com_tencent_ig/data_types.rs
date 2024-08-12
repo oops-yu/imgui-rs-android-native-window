@@ -7,7 +7,7 @@ pub struct Quat {
     pub w: f32,
 }
 #[repr(C)]
-#[derive(Default)]
+#[derive(Default,Debug)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,
@@ -15,7 +15,7 @@ pub struct Vec3 {
 }
 
 #[repr(C)]
-#[derive(Default)]
+#[derive(Default,Debug)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
@@ -29,13 +29,13 @@ pub struct FTransform {
     pub scale_3d: Vec3, // 3D 缩放向量
 }
 #[repr(C)]
-#[derive(Default)]
+#[derive(Default,Debug)]
 pub struct Bone {
     world_position: Vec3,     // 世界坐标
     position_on_screen: Vec2, // 屏幕坐标
 }
 #[repr(C)]
-#[derive(Default)]
+#[derive(Default,Debug)]
 pub struct Player {
     pub width: f32,              // 人物宽度
     pub world_position: Vec3,    // 世界坐标
@@ -70,7 +70,11 @@ pub struct Player {
     pub left_ankle: Bone,
     pub right_ankle: Bone,
 }
-
+impl Player {
+   pub  fn position_valid(&self)->bool{
+        !(self.world_position.x==0.0&&self.world_position.y==0.0&&self.world_position.z==0.0)
+    }
+}
 #[repr(C)]
 pub struct Supply {
     pub width_on_screen: f32, // 在屏幕上的宽度宽度

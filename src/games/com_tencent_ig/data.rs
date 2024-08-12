@@ -1,6 +1,8 @@
 #[allow(unused_imports)]
 use super::data_types::*;
 pub struct GameData {
+    pub local_player:u64,
+    pub local_team_id:i32,
     pub fov: f32,          // 自身fov
     pub matrix: [f32; 16], // 游戏矩阵
     pub firing: i32,       // 开火判断
@@ -14,6 +16,8 @@ pub struct GameData {
 impl Default for GameData {
     fn default() -> Self {
         Self {
+            local_player:0,
+            local_team_id:0,
             fov: 0.0,
             matrix: [0.0; 16],
             firing: 0,

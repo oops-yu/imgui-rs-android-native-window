@@ -103,12 +103,12 @@ impl GameMem {
     }
 
     
-    pub fn read_with_offsets<T: Default>(&mut self, addr: u64, offsets: &[u64]) -> Option<T> {
+    pub fn read_with_offsets<T: Default>(&mut self, addr: u64, offsets: &[u64]) -> T{
         
         if self.read_memory_with_offsets(addr, self.buffer.as_ptr() as *mut T, offsets) {
-            return Some(unsafe { ptr::read(self.buffer.as_ptr() as *const T) });
+            return unsafe { ptr::read(self.buffer.as_ptr() as *const T) };
         }
-        None
+        Default::default()
     }
 
     
