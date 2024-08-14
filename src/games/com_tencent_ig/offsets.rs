@@ -28,6 +28,7 @@ define_offsets!(
     ONVEHICLE:[0x1c0],
     VELOCITYNOTONVEHICLE:[0x1bb0, 0x12c],
     VELOCITYONVEHICLE:[0x1330],
-    ISBOT:[0x9d9]
+    ISBOT:[0x9d9],
+    PLAYERNAME:[0x8e0,0x0]
 
 );

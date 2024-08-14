@@ -7,7 +7,7 @@ pub struct Quat {
     pub w: f32,
 }
 #[repr(C)]
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,
@@ -15,7 +15,7 @@ pub struct Vec3 {
 }
 
 #[repr(C)]
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
@@ -29,13 +29,13 @@ pub struct FTransform {
     pub scale_3d: Vec3, // 3D 缩放向量
 }
 #[repr(C)]
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 pub struct Bone {
     world_position: Vec3,     // 世界坐标
     position_on_screen: Vec2, // 屏幕坐标
 }
 #[repr(C)]
-#[derive(Default,Debug)]
+#[derive(Default, Debug)]
 pub struct Player {
     pub width: f32,              // 人物宽度
     pub world_position: Vec3,    // 世界坐标
@@ -71,8 +71,27 @@ pub struct Player {
     pub right_ankle: Bone,
 }
 impl Player {
-   pub  fn position_valid(&self)->bool{
-        !(self.world_position.x==0.0&&self.world_position.y==0.0&&self.world_position.z==0.0)
+    pub fn position_valid(&self) -> bool {
+        !(self.world_position.x == 0.0
+            && self.world_position.y == 0.0
+            && self.world_position.z == 0.0)
+    }
+    pub fn is_in_screen(&self) -> bool {
+        self.camera_angle > 0.0
+    }
+    pub fn get_name<'a>(&'a self) -> &'a str {
+        // 查找0x00的位置
+        let len = self
+            .player_name
+            .iter()
+            .position(|&c| c == 0x00)
+            .unwrap_or(self.player_name.len());
+
+        // 创建不包括0x00的子切片
+        let utf8_slice = &self.player_name[..len];
+
+        // 将子切片转换为 &str
+        std::str::from_utf8(utf8_slice).expect("Invalid UTF-8 sequence")
     }
 }
 #[repr(C)]
