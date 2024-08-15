@@ -149,6 +149,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         let (health, max_health) =
             game_mem.read_with_offsets::<(f32, f32)>(current_actor, offsets::HEALTH);
         current_player.health_percentage = health / max_health * 100.0;
+        current_player.max_health = max_health;
 
         //头甲包
 
@@ -515,11 +516,11 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 .thickness(2.0)
                 .build();
             let name = if player.is_bot {
-                "bot"
+                format!("bot {}",player.max_health)
             } else {
-                player.get_name()
+                format!("{} {}",player.get_name(),player.max_health)
             };
-            let text_size = ui.calc_text_size(name);
+            let text_size = ui.calc_text_size(&name);
             draw_list.add_text(
                 [
                     head.position_on_screen.x - (text_size[0] / 2.0),
@@ -530,23 +531,23 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             );
             //绘制骨骼
             //绘制点
-            let radius = 3.0;
-            let color = col;
-            draw_list.add_circle(head.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(chest.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(pelvis.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(left_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(right_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(left_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(right_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(left_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(right_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(left_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(right_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(left_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(right_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(left_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
-            draw_list.add_circle(right_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // let radius = 3.0;
+            // let color = col;
+            // draw_list.add_circle(head.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(chest.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(pelvis.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(left_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(right_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(left_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(right_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(left_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(right_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(left_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(right_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(left_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(right_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(left_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
+            // draw_list.add_circle(right_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
             //绘制骨骼
             let c = col;
             //chest -> left_shoulder

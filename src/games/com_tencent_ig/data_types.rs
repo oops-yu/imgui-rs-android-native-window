@@ -108,6 +108,7 @@ pub struct Player {
     pub armor: i32,              // 敌人甲
     pub is_bot: bool,            // 人机
     pub health_percentage: f32,  // 血量百分比
+    pub max_health:f32,
     pub distance_to_player: f32, // 距离
     pub player_name: [u8; 32],   // 玩家名称，字符数组需要转为字节数组
     pub velocity: Vec3,          // 速度
