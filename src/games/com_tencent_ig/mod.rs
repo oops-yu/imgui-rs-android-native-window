@@ -55,6 +55,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
 
             game_data.non_player_set.clear();
             game_data.players_set.clear();
+            game_data.local_team_set.clear();
 
             OLDUWORLD = uworld;
             OLDGNAME = gname;
@@ -97,7 +98,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
     );
     for i in 0..actors_count {
         let current_actor = game_data.actor_array[i as usize];
-        if current_actor == game_data.local_player{
+        if game_data.local_team_set.contains(&current_actor) {
             continue;
         }
         if game_data.non_player_set.contains(&current_actor) {
@@ -130,7 +131,8 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         let mut current_player = Player::default();
         //是否同队
         current_player.team_id = game_mem.read_with_offsets(current_actor, offsets::TEAMID);
-        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
+        if current_player.team_id == game_data.local_team_id {
+            game_data.local_team_set.insert(current_actor);
             continue;
         }
 
@@ -142,7 +144,6 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         if !current_player.position_valid() {
             continue;
         }
-        
 
         // //血量
         let (health, max_health) =
@@ -172,7 +173,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         }
         //玩家是否为bot
         current_player.is_bot = game_mem.read_with_offsets(current_actor, offsets::ISBOT);
-        
+
         world_to_screen(
             &mut current_player.screen_position,
             &mut current_player.camera_angle,
@@ -183,7 +184,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             540.0,
         );
         //玩家姓名
-        let mut name:[u16;16] = [0;16];
+        let mut name: [u16; 16] = [0; 16];
         game_mem.read_memory_with_offsets(current_actor, &mut name, offsets::PLAYERNAME);
         get_utf8(&mut current_player.player_name, &name);
         // read bones positions
@@ -193,7 +194,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
 
             let mut head: FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
-            head.translation.z+=15.0;
+            head.translation.z += 15.0;
             get_bone_pos(
                 &head,
                 &c2w_trans,
@@ -465,13 +466,30 @@ pub fn ui(
     esp(ui, game_data);
 }
 
-
 fn esp(ui: &mut Ui, game_data: &mut GameData) {
     let draw_list = ui.get_background_draw_list();
-    let col = [1.0,1.0,1.0];
+    let col = [1.0, 1.0, 1.0];
     for player in &game_data.players {
         if player.camera_angle > 0.0 {
-            
+            let Player {
+                width,
+                head,
+                chest,
+                pelvis,
+                left_shoulder,
+                right_shoulder,
+                left_elbow,
+                right_elbow,
+                left_wrist,
+                right_wrist,
+                left_thigh,
+                right_thigh,
+                left_knee,
+                right_knee,
+                left_ankle,
+                right_ankle,
+                ..
+            } = player;
             // for searching bones
             // for i in &player.bone_debug {
             //     let pos = i.position_on_screen.to_pos();
@@ -484,22 +502,61 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             //         .thickness(5.0)
             //         .build();
             // }
-            let left = player.head.position_on_screen.x -player.width*0.6;
-            let right = player.head.position_on_screen.x +player.width*0.6;
-            let top = player.head.position_on_screen.y - player.width/5.0;
-            let bottom = player.right_ankle.position_on_screen.y + player.width/10.0;
-            draw_list.add_rect([left,top],[right,bottom], col).thickness(2.0).build();
+            let left = head.position_on_screen.x - width * 0.6;
+            let right = head.position_on_screen.x + width * 0.6;
+            let top = head.position_on_screen.y - width / 5.0;
+            let bottom = right_ankle.position_on_screen.y + width / 10.0;
+            draw_list
+                .add_rect([left, top], [right, bottom], col)
+                .thickness(2.0)
+                .build();
             let name = if player.is_bot {
                 "bot"
             } else {
                 player.get_name()
-            }; 
+            };
+            let text_size = ui.calc_text_size(name);
             draw_list.add_text(
-                [player.head.position_on_screen.x-((name.len() as f32)*39.0/4.0),top-39.0],
+                [
+                    head.position_on_screen.x - (text_size[0] / 2.0),
+                    top - text_size[1],
+                ],
                 [1.0, 1.0, 1.0],
                 name,
             );
-            
+            //绘制骨骼
+            //绘制点
+            let radius = 3.0;
+            let color = col;
+            draw_list.add_circle(head.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(chest.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(pelvis.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(left_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(right_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(left_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(right_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(left_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(right_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(left_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(right_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(left_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(right_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(left_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
+            draw_list.add_circle(right_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
+            //绘制骨骼
+            //chest -> left_shoulder
+            //chest -> right_shoulder
+            //left_shoulder->left_elbow
+            //left_elbow->left_wrist
+            //right_shoulder->right_elbow
+            //right_elbow->right_wrist
+            //chest -> pelvis
+            //pelvis -> left_thigh
+            //pelvis -> right_thigh
+            //left_thigh -> left_knee
+            //left_knee -> left_ankle
+            //right_thigh -> right_knee
+            //right_knee -> right_ankle
         }
     }
 }

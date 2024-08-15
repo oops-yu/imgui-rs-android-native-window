@@ -15,6 +15,7 @@ pub struct GameData {
     pub supplies: Vec<Supply>,
     pub players_set:IntSet<u64>,
     pub non_player_set:IntSet<u64>,
+    pub local_team_set:IntSet<u64>,
     pub actor_array:[u64;2000]
 }
 impl Default for GameData {
@@ -35,6 +36,7 @@ impl Default for GameData {
             },
             players: Vec::with_capacity(100),   // 使用默认值初始化
             supplies: Vec::with_capacity(1000), // 初始化 Vec 具有 1000 的容量
+            local_team_set:IntSet::default(),
             players_set:IntSet::default(),
             non_player_set:IntSet::default(),
             actor_array:[0;2000]

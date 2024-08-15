@@ -128,9 +128,18 @@ impl<A: App> System<A> {
         let _ = f.read_to_end(&mut buf);
         let font_size = (13.0 * 3.0) as f32;
         imgui.fonts().add_font(&[
-            FontSource::DefaultFontData {
+            // FontSource::DefaultFontData {
+            //     config: Some(FontConfig {
+            //         size_pixels: font_size,
+            //         ..FontConfig::default()
+            //     }),
+            // },
+            FontSource::TtfData {
+                data: &buf,
+                size_pixels: font_size,
                 config: Some(FontConfig {
-                    size_pixels: font_size,
+                    rasterizer_multiply: 1.75,
+                    glyph_ranges: FontGlyphRanges::chinese_full(),
                     ..FontConfig::default()
                 }),
             },
@@ -139,7 +148,16 @@ impl<A: App> System<A> {
                 size_pixels: font_size,
                 config: Some(FontConfig {
                     rasterizer_multiply: 1.75,
-                    glyph_ranges: FontGlyphRanges::chinese_simplified_common(),
+                    glyph_ranges: FontGlyphRanges::japanese(),
+                    ..FontConfig::default()
+                }),
+            },
+            FontSource::TtfData {
+                data: &buf,
+                size_pixels: font_size,
+                config: Some(FontConfig {
+                    rasterizer_multiply: 1.75,
+                    glyph_ranges: FontGlyphRanges::korean(),
                     ..FontConfig::default()
                 }),
             },

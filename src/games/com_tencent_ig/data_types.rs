@@ -74,6 +74,7 @@ impl Vec2 {
         [self.x,self.y]
     }
 }
+
 #[repr(C)]
 #[derive(Default, Debug)]
 pub struct FTransform {
