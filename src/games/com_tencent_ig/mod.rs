@@ -179,7 +179,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             1200.0,
             540.0,
         );
-
+        //玩家姓名
+        let mut name:[u16;16] = [0;16];
+        game_mem.read_memory_with_offsets(current_actor, &mut name, offsets::PLAYERNAME);
+        get_utf8(&mut current_player.player_name, &name);
         // read bones positions
         if current_player.camera_angle > 0.0 {
             let mesh: u64 = game_mem.read_with_offsets(current_actor, offsets::MESH);
