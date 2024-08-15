@@ -180,17 +180,142 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             1200.0,
             540.0,
         );
-        let mesh: u64 = game_mem.read_with_offsets(current_actor, offsets::MESH);
-        let trans: FTransform = game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
-        // let head:FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
 
-        // let v2 = trans.rotation.rotate_vec(&head.translation);
-        // let v3 = trans.translation.translate(&v2);
-        // //v3.z += 7.0;
+        // read bones positions
+        if current_player.camera_angle > 0.0 {
+            let mesh: u64 = game_mem.read_with_offsets(current_actor, offsets::MESH);
+            let c2w_trans: FTransform =
+                game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
 
-        // world_to_screen_without_depth(&mut current_player.head.position_on_screen,&v3,&game_data.matrix,1200.0,540.0);
-        // current_player.bone_debug.push(current_player.head.clone());
-        
+            let head: FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
+
+            get_bone_pos(
+                &head,
+                &c2w_trans,
+                &mut current_player.head,
+                &game_data.matrix,
+            );
+
+            let chest: FTransform = game_mem.read_with_offsets(mesh, offsets::CHEST);
+
+            get_bone_pos(
+                &chest,
+                &c2w_trans,
+                &mut current_player.chest,
+                &game_data.matrix,
+            );
+
+            let left_shoulder: FTransform =
+                game_mem.read_with_offsets(mesh, offsets::LEFT_SHOULDER);
+
+            get_bone_pos(
+                &left_shoulder,
+                &c2w_trans,
+                &mut current_player.left_shoulder,
+                &game_data.matrix,
+            );
+
+            let right_shoulder: FTransform =
+                game_mem.read_with_offsets(mesh, offsets::RIGHT_SHOULDER);
+
+            get_bone_pos(
+                &right_shoulder,
+                &c2w_trans,
+                &mut current_player.right_shoulder,
+                &game_data.matrix,
+            );
+
+            let left_elbow: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ELBOW);
+
+            get_bone_pos(
+                &left_elbow,
+                &c2w_trans,
+                &mut current_player.left_elbow,
+                &game_data.matrix,
+            );
+
+            let right_elbow: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ELBOW);
+
+            get_bone_pos(
+                &right_elbow,
+                &c2w_trans,
+                &mut current_player.right_elbow,
+                &game_data.matrix,
+            );
+
+            let left_wrist: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_WRIST);
+
+            get_bone_pos(
+                &left_wrist,
+                &c2w_trans,
+                &mut current_player.left_wrist,
+                &game_data.matrix,
+            );
+
+            let right_wrist: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_WRIST);
+
+            get_bone_pos(
+                &right_wrist,
+                &c2w_trans,
+                &mut current_player.right_wrist,
+                &game_data.matrix,
+            );
+
+            let left_thigh: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_THIGH);
+
+            get_bone_pos(
+                &left_thigh,
+                &c2w_trans,
+                &mut current_player.left_thigh,
+                &game_data.matrix,
+            );
+
+            let right_thigh: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGTH_THIGH);
+
+            get_bone_pos(
+                &right_thigh,
+                &c2w_trans,
+                &mut current_player.right_thigh,
+                &game_data.matrix,
+            );
+
+            let left_knee: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_KNEE);
+
+            get_bone_pos(
+                &left_knee,
+                &c2w_trans,
+                &mut current_player.left_knee,
+                &game_data.matrix,
+            );
+
+            let right_knee: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_KNEE);
+
+            get_bone_pos(
+                &right_knee,
+                &c2w_trans,
+                &mut current_player.right_knee,
+                &game_data.matrix,
+            );
+
+            let left_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ANKLE);
+
+            get_bone_pos(
+                &left_ankle,
+                &c2w_trans,
+                &mut current_player.left_ankle,
+                &game_data.matrix,
+            );
+
+            let right_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
+
+            get_bone_pos(
+                &right_ankle,
+                &c2w_trans,
+                &mut current_player.right_ankle,
+                &game_data.matrix,
+            );
+        }
+
         //for searching bone indexes
 
         // for i in 0..70 {
@@ -212,7 +337,16 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         game_data.players.push(current_player);
     }
 }
-fn get_bone_pos(&mut)
+fn get_bone_pos(
+    bone_trans: &FTransform,
+    c2w_trans: &FTransform,
+    bone: &mut Bone,
+    w2s_matrix: &[f32; 16],
+) {
+    let v2 = c2w_trans.rotation.rotate_vec(&bone_trans.translation);
+    let v3 = c2w_trans.translation.translate(&v2);
+    world_to_screen_without_depth(&mut bone.position_on_screen, &v3, w2s_matrix, 1200.0, 540.0);
+}
 fn world_to_screen(
     bscreen: &mut Vec2,
     camea: &mut f32,
@@ -266,7 +400,7 @@ fn get_utf8(buf: &mut [u8], buf16: &[u16; 16]) {
             buf[p_temp_utf8] = (utf16 >> 6) as u8 | 0xC0;
             buf[p_temp_utf8 + 1] = (utf16 & 0x3F) as u8 | 0x80;
             p_temp_utf8 += 2;
-        } else if utf16 >= 0x0800  && p_temp_utf8 + 3 <= p_utf8_end {
+        } else if utf16 >= 0x0800 && p_temp_utf8 + 3 <= p_utf8_end {
             buf[p_temp_utf8] = (utf16 >> 12) as u8 | 0xE0;
             buf[p_temp_utf8 + 1] = ((utf16 >> 6) & 0x3F) as u8 | 0x80;
             buf[p_temp_utf8 + 2] = (utf16 & 0x3F) as u8 | 0x80;
@@ -316,6 +450,8 @@ pub fn ui(
     get_data(game_mem, game_data);
     esp(ui, game_data);
 }
+
+
 fn esp(ui: &mut Ui, game_data: &mut GameData) {
     let draw_list = ui.get_background_draw_list();
     for player in &game_data.players {
@@ -344,4 +480,3 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
         }
     }
 }
-

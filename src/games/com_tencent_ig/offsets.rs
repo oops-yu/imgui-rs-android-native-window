@@ -39,14 +39,14 @@ define_offsets!(
     LEFT_WRIST:[16 * 48],
     RIGHT_WRIST:[54*48],
     LEFT_SHOULDER:[14 * 48],
-    RIGTH_SHOULDER:[35 * 48],
+    RIGHT_SHOULDER:[35 * 48],
     RIGHT_CLAVICLE:[34 * 48],
     PELVIS:[1*48],
     LEFT_THIGH:[55 * 48],
     RIGTH_THIGH:[59 * 48],
     LEFT_KNEE:[56 * 48],
-    RIGTH_KNEE:[60 * 48],
+    RIGHT_KNEE:[60 * 48],
     LEFT_ANKLE:[57 * 48],
-    RIGTH_ANKLE:[61 * 48]
+    RIGHT_ANKLE:[61 * 48]
 
 );
