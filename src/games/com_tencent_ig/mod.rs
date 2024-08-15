@@ -187,8 +187,8 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             let c2w_trans: FTransform =
                 game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
 
-            let head: FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
-
+            let mut head: FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
+            head.translation.z+=17.0;
             get_bone_pos(
                 &head,
                 &c2w_trans,
@@ -202,6 +202,15 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &chest,
                 &c2w_trans,
                 &mut current_player.chest,
+                &game_data.matrix,
+            );
+
+            let pelvis: FTransform = game_mem.read_with_offsets(mesh, offsets::PELVIS);
+
+            get_bone_pos(
+                &pelvis,
+                &c2w_trans,
+                &mut current_player.pelvis,
                 &game_data.matrix,
             );
 
@@ -454,10 +463,11 @@ pub fn ui(
 
 fn esp(ui: &mut Ui, game_data: &mut GameData) {
     let draw_list = ui.get_background_draw_list();
+    let col = [1.0,1.0,1.0];
     for player in &game_data.players {
         if player.camera_angle > 0.0 {
             draw_list.add_text(
-                [player.screen_position.x, player.screen_position.y],
+                player.screen_position.to_pos(),
                 [1.0, 1.0, 1.0],
                 if player.is_bot {
                     "bot"
@@ -477,6 +487,10 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             //         .thickness(5.0)
             //         .build();
             // }
+            
+            draw_list.add_circle(player.head.position_on_screen.to_pos(), 10.0, col).filled(true).build();
+
+            
         }
     }
 }

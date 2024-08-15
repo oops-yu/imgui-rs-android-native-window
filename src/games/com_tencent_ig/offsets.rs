@@ -32,7 +32,7 @@ define_offsets!(
     PLAYERNAME:[0x8e0,0x0],
     C2W_TRANSFORM:[0x490,0x1b0],
     MESH:[0x490,0x870],
-    HEAD:[16 * 48],
+    HEAD:[5 * 48],
     CHEST:[4*48],
     LEFT_ELBOW:[15 * 48],
     RIGHT_ELBOW:[36*48],
