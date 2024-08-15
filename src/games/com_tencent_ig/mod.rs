@@ -483,14 +483,15 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             let top = player.head.position_on_screen.y - player.width/5.0;
             let bottom = player.right_ankle.position_on_screen.y + player.width/10.0;
             draw_list.add_rect([left,top],[right,bottom], col).thickness(2.0).build();
+            let name = if player.is_bot {
+                "bot"
+            } else {
+                player.get_name()
+            }; 
             draw_list.add_text(
-                [player.head.position_on_screen.x,top],
+                [player.head.position_on_screen.x-((name.len() as f32)*39.0/2.0),top-39.0],
                 [1.0, 1.0, 1.0],
-                if player.is_bot {
-                    "bot"
-                } else {
-                    player.get_name()
-                },
+                name,
             );
             
         }
