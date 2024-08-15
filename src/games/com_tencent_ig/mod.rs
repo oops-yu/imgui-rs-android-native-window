@@ -489,7 +489,7 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 player.get_name()
             }; 
             draw_list.add_text(
-                [player.head.position_on_screen.x-((name.len() as f32)*39.0/2.0),top-39.0],
+                [player.head.position_on_screen.x-((name.len() as f32)*39.0/4.0),top-39.0],
                 [1.0, 1.0, 1.0],
                 name,
             );
