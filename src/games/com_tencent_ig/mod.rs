@@ -188,7 +188,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
 
             let mut head: FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
-            head.translation.z+=30.0;
+            head.translation.z+=15.0;
             get_bone_pos(
                 &head,
                 &c2w_trans,
