@@ -133,10 +133,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         if !current_player.position_valid() {
             continue;
         }
-        current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
-        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
-            continue;
-        }
+        // current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
+        // if current_player.team_id != game_data.local_team_id || current_player.team_id < 1 {
+        //     continue;
+        // }
 
         // //血量
         let (health, max_health) =
@@ -180,20 +180,37 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             1200.0,
             540.0,
         );
+        let mesh: u64 = game_mem.read_with_offsets(current_actor, offsets::MESH);
+        let trans: FTransform = game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
+        // let head:FTransform = game_mem.read_with_offsets(mesh, offsets::HEAD);
 
-        let trans:FTransform = game_mem.read_with_offsets(current_actor, offsets::UK);
-        let head:FTransform = game_mem.read_with_offsets(current_actor, offsets::HEAD);
+        // let v2 = trans.rotation.rotate_vec(&head.translation);
+        // let v3 = trans.translation.translate(&v2);
+        // //v3.z += 7.0;
 
-        let v2 = trans.rotation.rotate_vec(&head.translation);
-        let mut v3 = trans.translation.translate(&v2);
-        //v3.z += 7.0;
-        let mut test:f32 = 0.0;
-        let mut w:f32 = 0.0;
-        world_to_screen(&mut current_player.head.position_on_screen,&mut test,&mut w,&v3,&game_data.matrix,1200.0,540.0);
-        //println!("head:{head:?},trans:{trans:?},trasn:{:?}",current_player.world_position);
+        // world_to_screen_without_depth(&mut current_player.head.position_on_screen,&v3,&game_data.matrix,1200.0,540.0);
+        // current_player.bone_debug.push(current_player.head.clone());
+        
+        //for searching bone indexes
+
+        // for i in 0..70 {
+        //     let bone: FTransform = game_mem.read_with_offsets(mesh, &[48*i as u64]);
+        //     let v2 = trans.rotation.rotate_vec(&bone.translation);
+        //     let v3 = trans.translation.translate(&v2);
+        //     //v3.z += 7.0;
+        //     let mut bone1 :Bone = Bone::default();
+        //     world_to_screen_without_depth(
+        //         &mut bone1.position_on_screen,
+        //         &v3,
+        //         &game_data.matrix,
+        //         1200.0,
+        //         540.0,
+        //     );
+        //     bone1.name_for_debug = i.to_string();
+        //     current_player.bone_debug.push(bone1);
+        // }
         game_data.players.push(current_player);
     }
-    
 }
 fn world_to_screen(
     bscreen: &mut Vec2,
@@ -218,6 +235,20 @@ fn world_to_screen(
             * height;
     let bscreenz = bscreen.y - bscreen_z;
     *w = bscreenz / 2.0;
+}
+fn world_to_screen_without_depth(
+    bscreen: &mut Vec2,
+    obj: &Vec3,
+    matrix: &[f32; 16],
+    width: f32,
+    height: f32,
+) {
+    let camea = matrix[3] * obj.x + matrix[7] * obj.y + matrix[11] * obj.z + matrix[15];
+
+    bscreen.x = width
+        + (matrix[0] * obj.x + matrix[4] * obj.y + matrix[8] * obj.z + matrix[12]) / camea * width;
+    bscreen.y = height
+        - (matrix[1] * obj.x + matrix[5] * obj.y + matrix[9] * obj.z + matrix[13]) / camea * height;
 }
 fn get_utf8(buf: &mut [u8], buf16: &[u16; 16]) {
     let mut p_temp_utf16 = 0;
@@ -291,30 +322,25 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             draw_list.add_text(
                 [player.screen_position.x, player.screen_position.y],
                 [1.0, 1.0, 1.0],
-                if player.is_bot{
+                if player.is_bot {
                     "bot"
-                }else{
+                } else {
                     player.get_name()
-                }
-                ,
+                },
             );
-            draw_list.add_text(
-                [player.head.position_on_screen.x, player.head.position_on_screen.y],
-                [1.0, 1.0, 1.0],
-                "head"
-                ,
-            );
-            draw_list.add_line([player.screen_position.x, player.screen_position.y], [player.head.position_on_screen.x, player.head.position_on_screen.y], [1.0, 1.0, 1.0]).thickness(2.0).build();
+            // for searching bones
+            // for i in &player.bone_debug {
+            //     let pos = i.position_on_screen.to_pos();
+            //     let col = [1.0, 1.0, 1.0];
+
+            //     draw_list.add_text(pos, col, i.name_for_debug.clone());
+            //     draw_list
+            //         .add_circle(pos, 10.0, col)
+            //         .filled(true)
+            //         .thickness(5.0)
+            //         .build();
+            // }
         }
     }
 }
-// #[allow(unused_imports)]
-// use simple_logger::SimpleLogger;
-// #[cfg(debug_assertions)]
-// SimpleLogger::new().init()?;
-// let mut value = 0;
-// let choices = ["test test this is 1", "test test this is 2"];
-// System::new(APP_NAME)?.run((), move |run, ui, frame_rate| {
-//  ui(run,ui,frame_rate,config)
-//  esp(ui,config)
-// })?;
+

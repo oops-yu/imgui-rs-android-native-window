@@ -47,7 +47,7 @@ impl Quat {
     }
 }
 #[repr(C)]
-#[derive(Default, Debug)]
+#[derive(Default, Debug,Clone)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,
@@ -64,12 +64,16 @@ impl Vec3{
 }
 
 #[repr(C)]
-#[derive(Default, Debug)]
+#[derive(Default, Debug,Clone)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
-
+impl Vec2 {
+    pub fn to_pos(&self)->[f32;2]{
+        [self.x,self.y]
+    }
+}
 #[repr(C)]
 #[derive(Default, Debug)]
 pub struct FTransform {
@@ -79,10 +83,12 @@ pub struct FTransform {
     pub scale_3d: Vec3, // 3D 缩放向量
 }
 #[repr(C)]
-#[derive(Default, Debug)]
+#[derive(Default, Debug,Clone)]
 pub struct Bone {
     pub world_position: Vec3,     // 世界坐标
-    pub position_on_screen: Vec2, // 屏幕坐标
+    pub position_on_screen: Vec2,
+    //for searching bones
+    //pub name_for_debug:String // 屏幕坐标
 }
 #[repr(C)]
 #[derive(Default, Debug)]
@@ -119,6 +125,8 @@ pub struct Player {
     pub right_knee: Bone,
     pub left_ankle: Bone,
     pub right_ankle: Bone,
+    //for searhing bones
+    //pub bone_debug:Vec<Bone>
 }
 impl Player {
     pub fn position_valid(&self) -> bool {

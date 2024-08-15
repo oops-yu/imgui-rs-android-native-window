@@ -30,8 +30,23 @@ define_offsets!(
     VELOCITYONVEHICLE:[0x1330],
     ISBOT:[0x9d9],
     PLAYERNAME:[0x8e0,0x0],
-    HEAD:[0x490,0x870,48*11],
-    UK:[0x490,0x1b0],
-    RIGHT_WRIST:[0x490,0x870,48*54]
+    C2W_TRANSFORM:[0x490,0x1b0],
+    MESH:[0x490,0x870],
+    HEAD:[16 * 48],
+    CHEST:[4*48],
+    LEFT_ELBOW:[15 * 48],
+    RIGHT_ELBOW:[36*48],
+    LEFT_WRIST:[16 * 48],
+    RIGHT_WRIST:[54*48],
+    LEFT_SHOULDER:[14 * 48],
+    RIGTH_SHOULDER:[35 * 48],
+    RIGHT_CLAVICLE:[34 * 48],
+    PELVIS:[1*48],
+    LEFT_THIGH:[55 * 48],
+    RIGTH_THIGH:[59 * 48],
+    LEFT_KNEE:[56 * 48],
+    RIGTH_KNEE:[60 * 48],
+    LEFT_ANKLE:[57 * 48],
+    RIGTH_ANKLE:[61 * 48]
 
 );
