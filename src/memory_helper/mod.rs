@@ -1,6 +1,5 @@
 use once_cell::sync::Lazy;
 use std::fs::File;
-use std::io;
 use std::os::unix::io::AsRawFd;
 use std::ptr;
 #[allow(dead_code)]

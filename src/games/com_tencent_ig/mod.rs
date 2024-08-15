@@ -212,6 +212,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         game_data.players.push(current_player);
     }
 }
+fn get_bone_pos(&mut)
 fn world_to_screen(
     bscreen: &mut Vec2,
     camea: &mut f32,
@@ -265,7 +266,7 @@ fn get_utf8(buf: &mut [u8], buf16: &[u16; 16]) {
             buf[p_temp_utf8] = (utf16 >> 6) as u8 | 0xC0;
             buf[p_temp_utf8 + 1] = (utf16 & 0x3F) as u8 | 0x80;
             p_temp_utf8 += 2;
-        } else if utf16 >= 0x0800 && utf16 <= 0xFFFF && p_temp_utf8 + 3 <= p_utf8_end {
+        } else if utf16 >= 0x0800  && p_temp_utf8 + 3 <= p_utf8_end {
             buf[p_temp_utf8] = (utf16 >> 12) as u8 | 0xE0;
             buf[p_temp_utf8 + 1] = ((utf16 >> 6) & 0x3F) as u8 | 0x80;
             buf[p_temp_utf8 + 2] = (utf16 & 0x3F) as u8 | 0x80;
