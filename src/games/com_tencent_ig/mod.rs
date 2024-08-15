@@ -182,7 +182,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         );
 
         // read bones positions
-        if current_player.camera_angle > 0.0 {
+        if true {
             let mesh: u64 = game_mem.read_with_offsets(current_actor, offsets::MESH);
             let c2w_trans: FTransform =
                 game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
@@ -344,6 +344,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         //     current_player.bone_debug.push(bone1);
         // }
         game_data.players.push(current_player);
+        println!("{}",game_data.players.len());
     }
 }
 fn get_bone_pos(
@@ -489,7 +490,7 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             // }
             
             draw_list.add_circle(player.head.position_on_screen.to_pos(), 10.0, col).filled(true).build();
-
+            //draw_list.add_circle(player.right_ankle.position_on_screen.to_pos(), 10.0, col).filled(true).build();
             
         }
     }
