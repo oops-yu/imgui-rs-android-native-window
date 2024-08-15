@@ -131,10 +131,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         let mut current_player = Player::default();
         //是否同队
         current_player.team_id = game_mem.read_with_offsets(current_actor, offsets::TEAMID);
-        if current_player.team_id == game_data.local_team_id {
-            game_data.local_team_set.insert(current_actor);
-            continue;
-        }
+        // if current_player.team_id == game_data.local_team_id {
+        //     //game_data.local_team_set.insert(current_actor);
+        //     continue;
+        // }
 
         game_mem.read_memory_with_offsets(
             uk0x1b0,
@@ -329,13 +329,14 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &mut current_player.right_ankle,
                 &game_data.matrix,
             );
-        }
 
-        //for searching bone indexes
+
+
+            //for searching bone indexes
 
         // for i in 0..70 {
         //     let bone: FTransform = game_mem.read_with_offsets(mesh, &[48*i as u64]);
-        //     let v2 = trans.rotation.rotate_vec(&bone.translation);
+        //     let v2 = c2w_trans.rotation.rotate_vec(&bone.translation);
         //     let v3 = trans.translation.translate(&v2);
         //     //v3.z += 7.0;
         //     let mut bone1 :Bone = Bone::default();
@@ -349,6 +350,9 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         //     bone1.name_for_debug = i.to_string();
         //     current_player.bone_debug.push(bone1);
         // }
+        }
+
+        
         game_data.players.push(current_player);
     }
 }

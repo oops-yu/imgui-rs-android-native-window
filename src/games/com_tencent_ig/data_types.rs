@@ -88,8 +88,8 @@ pub struct FTransform {
 pub struct Bone {
     pub world_position: Vec3,     // 世界坐标
     pub position_on_screen: Vec2,
-    //for searching bones
-    //pub name_for_debug:String // 屏幕坐标
+   // for searching bones
+   // pub name_for_debug:String // 屏幕坐标
 }
 #[repr(C)]
 #[derive(Default, Debug)]
