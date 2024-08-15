@@ -7,46 +7,44 @@ pub struct Quat {
     pub y: f32,
     
     pub z: f32,
-
     pub w: f32,
 
 }
-pub fn multiply_matrices(a: &[f32; 16], b: &[f32; 16]) -> [f32; 16] {
-    let mut result = [0.0; 16];
-
-    for i in 0..4 {
-        for j in 0..4 {
-            result[i * 4 + j] = a[i * 4 + 0] * b[0 * 4 + j]
-                             + a[i * 4 + 1] * b[1 * 4 + j]
-                             + a[i * 4 + 2] * b[2 * 4 + j]
-                             + a[i * 4 + 3] * b[3 * 4 + j];
+impl Quat {
+   pub fn conjugate(&self) -> Quat {
+        Quat {
+            w: self.w,
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
         }
     }
 
-    result
-}
-pub fn transform_to_matrix(transform: &FTransform) -> [f32; 16] {
-    let x2 = transform.rotation.x + transform.rotation.x;
-    let y2 = transform.rotation.y + transform.rotation.y;
-    let z2 = transform.rotation.z + transform.rotation.z;
-    
-    let xx2 = transform.rotation.x * x2;
-    let yy2 = transform.rotation.y * y2;
-    let zz2 = transform.rotation.z * z2;
+  pub  fn multiply(&self, other: &Quat) -> Quat {
+        Quat {
+            w: self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z,
+            x: self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
+            y: self.w * other.y - self.x * other.z + self.y * other.w + self.z * other.x,
+            z: self.w * other.z + self.x * other.y - self.y * other.x + self.z * other.w,
+        }
+    }
 
-    let yz2 = transform.rotation.y * z2;
-    let wx2 = transform.rotation.w * x2;
-    let xy2 = transform.rotation.x * y2;
-    let wz2 = transform.rotation.w * z2;
-    let xz2 = transform.rotation.x * z2;
-    let wy2 = transform.rotation.w * y2;
+   pub fn rotate_vec(&self, vec: &Vec3) -> Vec3 {
+        let vec_quat = Quat {
+            w: 0.0,
+            x: vec.x,
+            y: vec.y,
+            z: vec.z,
+        };
 
-    [
-        (1.0 - (yy2 + zz2)) * transform.scale.x, (xy2 + wz2) * transform.scale.y, (xz2 - wy2) * transform.scale.z, 0.0,
-        (xy2 - wz2) * transform.scale.x, (1.0 - (xx2 + zz2)) * transform.scale.y, (yz2 + wx2) * transform.scale.z, 0.0,
-        (xz2 + wy2) * transform.scale.x, (yz2 - wx2) * transform.scale.y, (1.0 - (xx2 + yy2)) * transform.scale.z, 0.0,
-        transform.translation.x, transform.translation.y, transform.translation.z, 1.0,
-    ]
+        let rotated_quat = self.multiply(&vec_quat).multiply(&self.conjugate());
+
+        Vec3 {
+            x: rotated_quat.x,
+            y: rotated_quat.y,
+            z: rotated_quat.z,
+        }
+    }
 }
 #[repr(C)]
 #[derive(Default, Debug)]
@@ -78,7 +76,7 @@ pub struct FTransform {
     pub rotation: Quat,    // 旋转四元数
     pub translation: Vec3, // 位移向量
     pub chunk: f32,
-    pub scale: Vec3, // 3D 缩放向量
+    pub scale_3d: Vec3, // 3D 缩放向量
 }
 #[repr(C)]
 #[derive(Default, Debug)]

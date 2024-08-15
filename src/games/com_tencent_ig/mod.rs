@@ -133,10 +133,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         if !current_player.position_valid() {
             continue;
         }
-        // current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
-        // if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
-        //     continue;
-        // }
+        current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
+        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
+            continue;
+        }
 
         // //血量
         let (health, max_health) =
@@ -182,14 +182,11 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         );
 
         let trans:FTransform = game_mem.read_with_offsets(current_actor, offsets::UK);
-        let head:FTransform = game_mem.read_with_offsets(current_actor, offsets::RIGHT_WRIST);
-        let c2w = transform_to_matrix(&trans);
-        let head_bone = transform_to_matrix(&head);
-        let res =multiply_matrices(&head_bone, &c2w);
-        let mut v3 =Vec3{x:res[3*4],y:res[3*4+1],z:res[3*4+2]}; 
-        
-        
-        v3.z += 7.0;
+        let head:FTransform = game_mem.read_with_offsets(current_actor, offsets::HEAD);
+
+        let v2 = trans.rotation.rotate_vec(&head.translation);
+        let mut v3 = trans.translation.translate(&v2);
+        //v3.z += 7.0;
         let mut test:f32 = 0.0;
         let mut w:f32 = 0.0;
         world_to_screen(&mut current_player.head.position_on_screen,&mut test,&mut w,&v3,&game_data.matrix,1200.0,540.0);
