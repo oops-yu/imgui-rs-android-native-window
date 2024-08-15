@@ -29,6 +29,9 @@ define_offsets!(
     VELOCITYNOTONVEHICLE:[0x1bb0, 0x12c],
     VELOCITYONVEHICLE:[0x1330],
     ISBOT:[0x9d9],
-    PLAYERNAME:[0x8e0,0x0]
+    PLAYERNAME:[0x8e0,0x0],
+    HEAD:[0x490,0x870,48*11],
+    UK:[0x490,0x1b0],
+    RIGHT_WRIST:[0x490,0x870,48*54]
 
 );

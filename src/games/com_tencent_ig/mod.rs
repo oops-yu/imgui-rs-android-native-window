@@ -1,11 +1,13 @@
 static mut UE4: u64 = 0;
-
+static mut OLDUWORLD: u64 = 0;
+static mut OLDULEVEL: u64 = 0;
+static mut OLDGNAME: u64 = 0;
 mod data;
 mod data_types;
 mod offsets;
 use crate::common::System;
 use crate::memory_helper::GameMem;
-use std::time::Duration;
+
 pub fn run() {
     //0.init driver
     let mut game_mem = GameMem::new();
@@ -23,14 +25,13 @@ pub fn run() {
     let mut game_data = GameData::default();
     // let mut value = 0;
     // let choices = ["test test this is 1", "test test this is 2"];
-    
+
     System::new("title")
         .unwrap()
         .run((), move |run, ui1, frame_rate| {
-            ui(run, ui1, frame_rate,&mut game_data,&mut game_mem);
+            ui(run, ui1, frame_rate, &mut game_data, &mut game_mem);
         })
         .expect("failed");
-    
 }
 struct Config {}
 
@@ -41,13 +42,28 @@ use imgui::Ui;
 use data::*;
 #[allow(unused_imports)]
 use data_types::*;
-pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
+
+pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
     let ue4 = unsafe { UE4 };
 
     let uworld = game_mem.read_with_offsets::<u64>(ue4, offsets::UWORLD);
-    let gname = game_mem.read_with_offsets::<u64>(ue4, offsets::GNAME);
-    let ulevel = game_mem.read_with_offsets::<u64>(uworld, offsets::ULEVEL);
-    let (actors_addr, actors_count) = game_mem.read_with_offsets::<(u64, i32)>(ulevel, offsets::OBJARR);
+    let (mut gname, mut ulevel) = unsafe { (OLDGNAME, OLDULEVEL) };
+    unsafe {
+        if OLDUWORLD != uworld {
+            gname = game_mem.read_with_offsets::<u64>(ue4, offsets::GNAME);
+            ulevel = game_mem.read_with_offsets::<u64>(uworld, offsets::ULEVEL);
+
+            game_data.non_player_set.clear();
+            game_data.players_set.clear();
+
+            OLDUWORLD = uworld;
+            OLDGNAME = gname;
+            OLDULEVEL = ulevel;
+        }
+    }
+
+    let (actors_addr, actors_count) =
+        game_mem.read_with_offsets::<(u64, i32)>(ulevel, offsets::OBJARR);
     // println!(
     //     "ue4:{ue4:#016x}\nuworld:{uworld:#016x}\ngname:{gname:#016x}\nulevel:{ulevel:#016x}\n"
     // );
@@ -70,16 +86,32 @@ pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
 
     game_data.players.clear();
     //read player array
-    let mut players:Vec<(u64,i32)> = vec![];
+    // for i in 0..actors_count {
+    //     game_data.actor_array[i as usize] = game_mem.read_with_offsets(actors_addr, &[(i*8) as u64])
+    // }
+    game_mem.read_memory_with_length_and_offsets(
+        actors_addr,
+        game_data.actor_array.as_mut_ptr() as _,
+        actors_count as usize * 8,
+        &[0],
+    );
     for i in 0..actors_count {
-        let current_obj = game_mem.read_with_offsets::<u64>(actors_addr, &[8 * i as u64]);
-        let current_obj_type = game_mem.read_with_offsets::<f32>(current_obj, offsets::OBJTYPE);
-        if current_obj_type != 479.5 {
+        let current_actor = game_data.actor_array[i as usize];
+        if game_data.non_player_set.contains(&current_actor) {
             continue;
         }
-        
-       // 这里不知道跳过了啥
-        let uk0x1b0 = game_mem.read_with_offsets::<u64>(current_obj, offsets::UK0X1B0);
+        if !game_data.players_set.contains(&current_actor) {
+            let current_actor_type =
+                game_mem.read_with_offsets::<f32>(current_actor, offsets::OBJTYPE);
+            if current_actor_type != 479.5 {
+                game_data.non_player_set.insert(current_actor);
+                continue;
+            }
+            game_data.players_set.insert(current_actor);
+        }
+
+        //读取玩家信息
+        let uk0x1b0 = game_mem.read_with_offsets::<u64>(current_actor, offsets::UK0X1B0);
         if uk0x1b0 <= 0xffff
             || uk0x1b0 == 0
             || uk0x1b0 <= 0x10000000
@@ -88,11 +120,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
         {
             continue;
         }
-        let uk0xf60 = game_mem.read_with_offsets::<i32>(current_obj, offsets::UK0XF60);
+        let uk0xf60 = game_mem.read_with_offsets::<i32>(current_actor, offsets::UK0XF60);
         if uk0xf60 == 262144 || uk0xf60 == 262152 {
             continue;
         }
-
         let mut current_player = Player::default();
         game_mem.read_memory_with_offsets(
             uk0x1b0,
@@ -102,16 +133,14 @@ pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
         if !current_player.position_valid() {
             continue;
         }
-        current_player.team_id = game_mem.read_with_offsets(current_obj, offsets::TEAMID);
-        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
-            continue;
-        }
+        // current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
+        // if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
+        //     continue;
+        // }
 
-        players.push((current_obj,i));
-
-        //血量
+        // //血量
         let (health, max_health) =
-            game_mem.read_with_offsets::<(f32, f32)>(current_obj, offsets::HEALTH);
+            game_mem.read_with_offsets::<(f32, f32)>(current_actor, offsets::HEALTH);
         current_player.health_percentage = health / max_health * 100.0;
 
         //头甲包
@@ -120,7 +149,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
 
         //玩家的速度
 
-        let on_vehicle = game_mem.read_with_offsets::<u64>(current_obj, offsets::ONVEHICLE);
+        let on_vehicle = game_mem.read_with_offsets::<u64>(current_actor, offsets::ONVEHICLE);
         if on_vehicle != 0 {
             // player is on vehicle
             game_mem.read_memory_with_offsets(
@@ -130,18 +159,18 @@ pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
             );
         } else {
             game_mem.read_memory_with_offsets(
-                current_obj,
+                current_actor,
                 &mut current_player.velocity,
                 offsets::VELOCITYNOTONVEHICLE,
             );
         }
         //玩家是否为bot
-        current_player.is_bot = game_mem.read_with_offsets(current_obj, offsets::ISBOT);
+        current_player.is_bot = game_mem.read_with_offsets(current_actor, offsets::ISBOT);
         //玩家name
         let mut src: [u16; 16] = [0; 16];
-        game_mem.read_memory_with_offsets(current_obj, &mut src, offsets::PLAYERNAME);
+        game_mem.read_memory_with_offsets(current_actor, &mut src, offsets::PLAYERNAME);
         get_utf8(&mut current_player.player_name, &src);
-        //计算屏幕坐标
+
         world_to_screen(
             &mut current_player.screen_position,
             &mut current_player.camera_angle,
@@ -151,15 +180,23 @@ pub fn get_data(game_mem: &mut GameMem, game_data:&mut GameData) {
             1200.0,
             540.0,
         );
+
+        let trans:FTransform = game_mem.read_with_offsets(current_actor, offsets::UK);
+        let head:FTransform = game_mem.read_with_offsets(current_actor, offsets::RIGHT_WRIST);
+        let c2w = transform_to_matrix(&trans);
+        let head_bone = transform_to_matrix(&head);
+        let res =multiply_matrices(&head_bone, &c2w);
+        let mut v3 =Vec3{x:res[3*4],y:res[3*4+1],z:res[3*4+2]}; 
+        
+        
+        v3.z += 7.0;
+        let mut test:f32 = 0.0;
+        let mut w:f32 = 0.0;
+        world_to_screen(&mut current_player.head.position_on_screen,&mut test,&mut w,&v3,&game_data.matrix,1200.0,540.0);
+        //println!("head:{head:?},trans:{trans:?},trasn:{:?}",current_player.world_position);
         game_data.players.push(current_player);
     }
-    for i in 0..players.len(){
-        if i+1 >= players.len()-1{
-            break;
-        }
-        print!("{:#016x}  ",players[i+1].0-players[i].0);
-        
-    }
+    
 }
 fn world_to_screen(
     bscreen: &mut Vec2,
@@ -218,7 +255,7 @@ pub fn ui(
     ui: &mut Ui,
     frame_rate: &mut f32,
     game_data: &mut GameData,
-    game_mem: &mut GameMem
+    game_mem: &mut GameMem,
 ) {
     ui.window("HEllo world")
         .opened(opened)
@@ -235,7 +272,7 @@ pub fn ui(
             ui.separator();
             ui.text("chose:");
             ui.same_line();
-            ui.radio_button("30", frame_rate, 1.0);
+            ui.radio_button("30", frame_rate, 30.0);
             ui.same_line();
             ui.radio_button("60", frame_rate, 60.0);
             ui.same_line();
@@ -246,21 +283,34 @@ pub fn ui(
 
             ui.separator();
             ui.text_colored([1.0, 1.0, 1.0, 1.0], format!("fps : {}", ui.io().framerate));
-            get_data(game_mem, game_data);
-            // let draw_list = ui.get_background_draw_list();
-            // for player in &game_data.players {
-            //     if player.camera_angle > 0.0{
-            //         draw_list.add_text(
-            //             [player.screen_position.x, player.screen_position.y],
-            //             [1.0, 1.0, 1.0],
-            //             "bot",
-            //         );
-                    
-            //     }
-            // }
         });
+    get_data(game_mem, game_data);
+    esp(ui, game_data);
 }
-
+fn esp(ui: &mut Ui, game_data: &mut GameData) {
+    let draw_list = ui.get_background_draw_list();
+    for player in &game_data.players {
+        if player.camera_angle > 0.0 {
+            draw_list.add_text(
+                [player.screen_position.x, player.screen_position.y],
+                [1.0, 1.0, 1.0],
+                if player.is_bot{
+                    "bot"
+                }else{
+                    player.get_name()
+                }
+                ,
+            );
+            draw_list.add_text(
+                [player.head.position_on_screen.x, player.head.position_on_screen.y],
+                [1.0, 1.0, 1.0],
+                "head"
+                ,
+            );
+            draw_list.add_line([player.screen_position.x, player.screen_position.y], [player.head.position_on_screen.x, player.head.position_on_screen.y], [1.0, 1.0, 1.0]).thickness(2.0).build();
+        }
+    }
+}
 // #[allow(unused_imports)]
 // use simple_logger::SimpleLogger;
 // #[cfg(debug_assertions)]

@@ -22,6 +22,7 @@ imgui-rs-vulkan-renderer = { version="1.13.0", features = ["gpu-allocator"] }
 evdev = "0.12.2"
 libc = "*"
 once_cell ="*"
+nohash-hasher = "0.2.0"
 [profile.release]
 # panic = 'abort'
 # lto = 'fat'

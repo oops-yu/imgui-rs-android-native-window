@@ -82,7 +82,33 @@ impl GameMem {
 
         true
     }
-    
+    pub fn read_memory_with_length_and_offsets(&self, addr: u64, buffer: *mut libc::c_void,length:usize, offsets: &[u64]) -> bool {
+        let mut cm = CopyMemory {
+            pid: self.pid,
+            addr,
+            buffer: buffer as *mut libc::c_void,
+            size: length,
+            offsets_count: offsets.len(),
+            offsets: [0; 10],
+        };
+
+        if cm.offsets_count > 10 {
+            return false;
+        }
+
+        for (dst, &src) in cm.offsets.iter_mut().zip(offsets.iter()) {
+            *dst = src;
+        }
+
+        let fd = self.fd.as_raw_fd();
+        let res = unsafe { libc::ioctl(fd, OP_READ_MEM as _, &cm) };
+
+        if res != 0 {
+            return false;
+        }
+
+        true
+    }
 
     pub fn get_module_base(&self, name: &str) ->Option<u64> {
         let c_name = std::ffi::CString::new(name).unwrap();
