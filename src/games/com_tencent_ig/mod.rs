@@ -125,6 +125,12 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             continue;
         }
         let mut current_player = Player::default();
+        //是否同队
+        current_player.team_id = game_mem.read_with_offsets(current_actor, offsets::TEAMID);
+        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
+            continue;
+        }
+
         game_mem.read_memory_with_offsets(
             uk0x1b0,
             &mut current_player.world_position,
@@ -133,10 +139,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         if !current_player.position_valid() {
             continue;
         }
-        current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
-        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
-            continue;
-        }
+        
 
         // //血量
         let (health, max_health) =
@@ -166,11 +169,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         }
         //玩家是否为bot
         current_player.is_bot = game_mem.read_with_offsets(current_actor, offsets::ISBOT);
-        //玩家name
-        let mut src: [u16; 16] = [0; 16];
-        game_mem.read_memory_with_offsets(current_actor, &mut src, offsets::PLAYERNAME);
-        get_utf8(&mut current_player.player_name, &src);
-
+        
         world_to_screen(
             &mut current_player.screen_position,
             &mut current_player.camera_angle,
@@ -182,7 +181,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         );
 
         // read bones positions
-        if true {
+        if current_player.camera_angle > 0.0 {
             let mesh: u64 = game_mem.read_with_offsets(current_actor, offsets::MESH);
             let c2w_trans: FTransform =
                 game_mem.read_with_offsets(current_actor, offsets::C2W_TRANSFORM);
@@ -466,15 +465,7 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
     let col = [1.0,1.0,1.0];
     for player in &game_data.players {
         if player.camera_angle > 0.0 {
-            draw_list.add_text(
-                player.screen_position.to_pos(),
-                [1.0, 1.0, 1.0],
-                if player.is_bot {
-                    "bot"
-                } else {
-                    player.get_name()
-                },
-            );
+            
             // for searching bones
             // for i in &player.bone_debug {
             //     let pos = i.position_on_screen.to_pos();
@@ -487,8 +478,20 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             //         .thickness(5.0)
             //         .build();
             // }
-            
-            draw_list.add_rect(player.head.position_on_screen.to_pos(), player.left_ankle.position_on_screen.to_pos(), col).thickness(2.0).build();
+            let left = player.head.position_on_screen.x -player.width*0.6;
+            let right = player.head.position_on_screen.x +player.width*0.6;
+            let top = player.head.position_on_screen.y - player.width/5.0;
+            let bottom = player.right_ankle.position_on_screen.y + player.width/10.0;
+            draw_list.add_rect([left,top],[right,bottom], col).thickness(2.0).build();
+            draw_list.add_text(
+                [player.head.position_on_screen.x,top],
+                [1.0, 1.0, 1.0],
+                if player.is_bot {
+                    "bot"
+                } else {
+                    player.get_name()
+                },
+            );
             
         }
     }
