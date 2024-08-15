@@ -93,10 +93,13 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         actors_addr,
         game_data.actor_array.as_mut_ptr() as _,
         actors_count as usize * 8,
-        &[0],
+        &[],
     );
     for i in 0..actors_count {
         let current_actor = game_data.actor_array[i as usize];
+        if current_actor == game_data.local_player{
+            continue;
+        }
         if game_data.non_player_set.contains(&current_actor) {
             continue;
         }
