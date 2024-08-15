@@ -28,7 +28,10 @@ struct ModuleBase {
 pub struct GameMem {
     fd: File,
     pid: libc::pid_t,
-    buffer:[u8;1024]
+    buffer:[u8;1024],
+    additional_offset:u64,
+    is_additional_offset_negative:bool,
+    need_additional_offset:bool
 }
 
 impl GameMem {
@@ -38,7 +41,7 @@ impl GameMem {
             .write(true)
             .open("/proc/kmsg")
             .expect("[-] open driver failed");
-        GameMem { fd: file, pid: 0 ,buffer:[0;1024]}
+        GameMem { fd: file, pid: 0 ,buffer:[0;1024],additional_offset:0,is_additional_offset_negative:true,need_additional_offset:false}
     }
 
     pub fn initialize_with_pid(&mut self, pid: libc::pid_t) {
@@ -71,6 +74,13 @@ impl GameMem {
         for (dst, &src) in cm.offsets.iter_mut().zip(offsets.iter()) {
             *dst = src;
         }
+        if self.need_additional_offset{
+            if self.is_additional_offset_negative{
+                cm.offsets[cm.offsets_count-1] -= self.additional_offset;
+            }else{
+                cm.offsets[cm.offsets_count-1] += self.additional_offset;
+            }
+        }
 
         let fd = self.fd.as_raw_fd();
         let res = unsafe { libc::ioctl(fd, OP_READ_MEM as _, &cm) };
@@ -98,7 +108,14 @@ impl GameMem {
         for (dst, &src) in cm.offsets.iter_mut().zip(offsets.iter()) {
             *dst = src;
         }
-
+        if self.need_additional_offset{
+            if self.is_additional_offset_negative{
+                cm.offsets[cm.offsets_count-1] -= self.additional_offset;
+            }else{
+                cm.offsets[cm.offsets_count-1] += self.additional_offset;
+            }
+        }
+        
         let fd = self.fd.as_raw_fd();
         let res = unsafe { libc::ioctl(fd, OP_READ_MEM as _, &cm) };
 
@@ -134,6 +151,15 @@ impl GameMem {
             return unsafe { ptr::read(self.buffer.as_ptr() as *const T) };
         }
         Default::default()
+    }
+    pub fn set_additional_offset(&mut self,offset:u64,negative:bool){
+        self.additional_offset=offset;
+        self.is_additional_offset_negative =negative;
+        self.need_additional_offset = true;
+    }
+    pub fn un_set_additional_offset(&mut self){
+
+        self.need_additional_offset = false;
     }
 
     

@@ -221,6 +221,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &game_data.matrix,
             );
 
+            if current_player.max_health  !=1000.0{
+                game_mem.set_additional_offset(48*2, true);
+            }
+            
             let left_shoulder: FTransform =
                 game_mem.read_with_offsets(mesh, offsets::LEFT_SHOULDER);
 
@@ -331,6 +335,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &game_data.matrix,
             );
 
+            game_mem.un_set_additional_offset();
 
 
             //for searching bone indexes
