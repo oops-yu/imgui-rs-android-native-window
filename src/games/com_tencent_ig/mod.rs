@@ -134,7 +134,7 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             continue;
         }
         current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
-        if current_player.team_id != game_data.local_team_id || current_player.team_id < 1 {
+        if current_player.team_id == game_data.local_team_id || current_player.team_id < 1 {
             continue;
         }
 
@@ -344,7 +344,6 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         //     current_player.bone_debug.push(bone1);
         // }
         game_data.players.push(current_player);
-        println!("{}",game_data.players.len());
     }
 }
 fn get_bone_pos(
@@ -489,8 +488,7 @@ fn esp(ui: &mut Ui, game_data: &mut GameData) {
             //         .build();
             // }
             
-            draw_list.add_circle(player.head.position_on_screen.to_pos(), 10.0, col).filled(true).build();
-            //draw_list.add_circle(player.right_ankle.position_on_screen.to_pos(), 10.0, col).filled(true).build();
+            draw_list.add_rect(player.head.position_on_screen.to_pos(), player.left_ankle.position_on_screen.to_pos(), col).thickness(2.0).build();
             
         }
     }

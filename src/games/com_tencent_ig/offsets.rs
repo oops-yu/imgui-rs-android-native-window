@@ -40,7 +40,6 @@ define_offsets!(
     RIGHT_WRIST:[54*48],
     LEFT_SHOULDER:[14 * 48],
     RIGHT_SHOULDER:[35 * 48],
-    RIGHT_CLAVICLE:[34 * 48],
     PELVIS:[1*48],
     LEFT_THIGH:[55 * 48],
     RIGTH_THIGH:[59 * 48],
