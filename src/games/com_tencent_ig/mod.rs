@@ -352,7 +352,8 @@ fn get_bone_pos(
     bone: &mut Bone,
     w2s_matrix: &[f32; 16],
 ) {
-    let v2 = c2w_trans.rotation.rotate_vec(&bone_trans.translation);
+    let v1 = bone_trans.rotation.rotate_vec(&bone_trans.translation);
+    let v2 = c2w_trans.rotation.rotate_vec(&v1);
     let v3 = c2w_trans.translation.translate(&v2);
     world_to_screen_without_depth(&mut bone.position_on_screen, &v3, w2s_matrix, 1200.0, 540.0);
 }
