@@ -133,10 +133,10 @@ pub fn get_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         if !current_player.position_valid() {
             continue;
         }
-        // current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
-        // if current_player.team_id != game_data.local_team_id || current_player.team_id < 1 {
-        //     continue;
-        // }
+        current_player.team_id = game_mem.read_with_offsets(current_actor.clone(), offsets::TEAMID);
+        if current_player.team_id != game_data.local_team_id || current_player.team_id < 1 {
+            continue;
+        }
 
         // //血量
         let (health, max_health) =
