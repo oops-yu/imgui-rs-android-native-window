@@ -133,11 +133,13 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         }
         let mut current_player = Player::default();
         //是否同队
+        #[cfg(not(feature = "debug_bones"))]{
         current_player.team_id = game_mem.read_with_offsets(current_actor, offsets::TEAMID);
         if current_player.team_id == game_data.local_team_id {
             game_data.local_team_set.insert(current_actor);
             continue;
         }
+    }
 
         game_mem.read_memory_with_offsets(
             uk0x1b0,
