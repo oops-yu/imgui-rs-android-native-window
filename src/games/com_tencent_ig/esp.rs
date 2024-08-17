@@ -44,7 +44,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
             //框
             let left = head.position_on_screen.x - width * 0.8;
             let right = head.position_on_screen.x + width * 0.8;
-            let top = head.position_on_screen.y - width / 5.0;
+            let top = head.position_on_screen.y - width / 4.0;
             let bottom_ankle = if left_ankle.position_on_screen.y > right_ankle.position_on_screen.y
             {
                 left_ankle.position_on_screen.y
@@ -61,7 +61,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
             draw_list.add_line([right+3.0,bottom],[right+3.0,(top+(bottom-top)*(1.0-player.health_percentage))],[1.0,0.0,0.0]).thickness(2.0).build();
 
             
-            //名字+距离
+            //距离
             let name = if player.is_bot {
                 format!("bot {}m", player.distance_to_player as u32)
             } else {
