@@ -222,28 +222,12 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             if current_player.max_health != 1000.0 {
                 game_mem.set_additional_offset(48 * 2, true);
             }
-            let left_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ANKLE);
-
+           
+            let ground_contact:FTransform = game_mem.read_with_offsets(mesh, offsets::J8);
             get_bone_pos(
-                &left_ankle,
+                &ground_contact,
                 &c2w_trans,
-                &mut current_player.left_ankle,
-                &game_data.matrix,
-            );
-
-            let right_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
-
-            get_bone_pos(
-                &right_ankle,
-                &c2w_trans,
-                &mut current_player.right_ankle,
-                &game_data.matrix,
-            );
-            let j8:FTransform = game_mem.read_with_offsets(mesh, offsets::J8);
-            get_bone_pos(
-                &j8,
-                &c2w_trans,
-                &mut current_player.jb,
+                &mut current_player.ground_contact,
                 &game_data.matrix,
             );
 
@@ -352,11 +336,28 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                     &mut current_player.right_knee,
                     &game_data.matrix,
                 );
+                let left_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ANKLE);
+
+                get_bone_pos(
+                    &left_ankle,
+                    &c2w_trans,
+                    &mut current_player.left_ankle,
+                    &game_data.matrix,
+                );
+    
+                let right_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
+    
+                get_bone_pos(
+                    &right_ankle,
+                    &c2w_trans,
+                    &mut current_player.right_ankle,
+                    &game_data.matrix,
+                );
             }
             game_mem.un_set_additional_offset();
             #[cfg(feature = "debug_bones")]
             {
-                for i in 68..70 {
+                for i in 67..68 {
                     let bone: FTransform = game_mem.read_with_offsets(mesh, &[48 * i as u64]);
                     let mut bone1: Bone = Bone::default();
                     get_bone_pos(&bone, &c2w_trans, &mut bone1, &game_data.matrix);

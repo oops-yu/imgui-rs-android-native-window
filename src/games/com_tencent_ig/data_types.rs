@@ -131,7 +131,7 @@ pub struct Player {
     pub right_knee: Bone,
     pub left_ankle: Bone,
     pub right_ankle: Bone,
-    pub jb: Bone,
+    pub ground_contact: Bone,
     #[cfg(feature = "debug_bones")]
     pub bone_debug: Vec<Bone>,
 }

@@ -48,12 +48,6 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
             let left = head.position_on_screen.x - width * 0.8;
             let right = head.position_on_screen.x + width * 0.8;
             let mut top = head.position_on_screen.y - width / 3.0;
-            // let bottom_ankle = if left_ankle.position_on_screen.y > right_ankle.position_on_screen.y
-            // {
-            //     left_ankle.position_on_screen.y
-            // } else {
-            //     right_ankle.position_on_screen.y
-            // };
 
             let bottom = player.jb.position_on_screen.y + width / 10.0;
             draw_list
