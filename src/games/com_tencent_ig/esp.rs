@@ -3,14 +3,19 @@ use imgui::{FontId, StyleVar, Ui};
 use super::data::GameData;
 use super::data_types::*;
 
+static WHITE_OUTER: imgui::ImColor32 = imgui::ImColor32::from_rgba(255, 255, 255, 191);
+static WHITE_INNER: imgui::ImColor32 = imgui::ImColor32::from_rgba(255, 255, 255, 12);
+static GREEN_OUTER: imgui::ImColor32 = imgui::ImColor32::from_rgba(0, 255, 0, 191);
+static GREEN_INNER: imgui::ImColor32 = imgui::ImColor32::from_rgba(0, 255, 0, 12);
+static YELLOW: imgui::ImColor32 = imgui::ImColor32::from_rgba(255, 255, 0, 191);
+
 pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
     let draw_list = ui.get_background_draw_list();
 
     for player in &game_data.players {
         if player.is_in_screen() {
             let font_scale: f32 = 0.8;
-            let white = [1.0, 1.0, 1.0, 0.74];
-            let yellow = [1.0, 1.0, 0.0, 0.74];
+
             let Player {
                 width,
                 head,
@@ -50,10 +55,30 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
             let mut top = head.position_on_screen.y - width / 3.0;
 
             let bottom = player.ground_contact.position_on_screen.y + width / 10.0;
-            draw_list
-                .add_rect([left, top], [right, bottom], white)
-                .thickness(2.0)
-                .build();
+            if player.is_bot {
+                draw_list
+                    .add_rect([left, top], [right, bottom], WHITE_OUTER)
+                    .thickness(2.0)
+                    .filled(false)
+                    .build();
+                draw_list
+                    .add_rect([left, top], [right, bottom], WHITE_INNER)
+                    .thickness(2.0)
+                    .filled(true)
+                    .build();
+            } else {
+                draw_list
+                    .add_rect([left, top], [right, bottom], GREEN_OUTER)
+                    .thickness(2.0)
+                    .filled(false)
+                    .build();
+                draw_list
+                    .add_rect([left, top], [right, bottom], GREEN_INNER)
+                    .thickness(2.0)
+                    .filled(true)
+                    .build();
+            }
+
             //血量
             if player.health_percentage != 1.0 {
                 draw_list
@@ -80,7 +105,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                     head.position_on_screen.x - (distance_text_size[0] / 2.0),
                     top - distance_text_size[1],
                 ],
-                white,
+                WHITE_OUTER,
                 distance,
                 distance_text_size[1],
             );
@@ -99,7 +124,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                     head.position_on_screen.x - (name_text_size[0] / 2.0),
                     top - name_text_size[1],
                 ],
-                yellow,
+                YELLOW,
                 name,
                 name_text_size[1],
             );
@@ -108,7 +133,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 .add_line(
                     [1200.0, 0.0],
                     [head.position_on_screen.x, top - name_text_size[1]],
-                    white,
+                    WHITE_OUTER,
                 )
                 .thickness(2.0)
                 .build();
