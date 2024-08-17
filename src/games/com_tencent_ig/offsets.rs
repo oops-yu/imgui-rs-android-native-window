@@ -45,7 +45,7 @@ define_offsets!(
     RIGHT_KNEE:[(60) * 48],
     LEFT_ANKLE:[(57) * 48],
     RIGHT_ANKLE:[(61) * 48],
-    J8:[67],
+    GROUND_CONTACT:[67],
     WEAPON:[0x22B8, 0x500, 0x838, 0x178]
 
 );

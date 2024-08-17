@@ -226,7 +226,8 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 game_mem.set_additional_offset(48 * 2, true);
             }
 
-            let ground_contact: FTransform = game_mem.read_with_offsets(mesh, offsets::J8);
+            let ground_contact: FTransform =
+                game_mem.read_with_offsets(mesh, offsets::GROUND_CONTACT);
             get_bone_pos(
                 &ground_contact,
                 &c2w_trans,

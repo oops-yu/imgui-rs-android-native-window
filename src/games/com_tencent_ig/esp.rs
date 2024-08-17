@@ -49,7 +49,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
             let right = head.position_on_screen.x + width * 0.8;
             let mut top = head.position_on_screen.y - width / 3.0;
 
-            let bottom = player.jb.position_on_screen.y + width / 10.0;
+            let bottom = player.ground_contact.position_on_screen.y + width / 10.0;
             draw_list
                 .add_rect([left, top], [right, bottom], white)
                 .thickness(2.0)
