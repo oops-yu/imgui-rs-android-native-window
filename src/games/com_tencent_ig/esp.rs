@@ -45,7 +45,13 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
             let left = head.position_on_screen.x - width * 0.6;
             let right = head.position_on_screen.x + width * 0.6;
             let top = head.position_on_screen.y - width / 5.0;
-            let bottom = right_ankle.position_on_screen.y + width / 10.0;
+            let bottom_ankle = if left_ankle.position_on_screen.y>right_ankle.position_on_screen.y{
+                left_ankle.position_on_screen.y
+            }else{
+                right_ankle.position_on_screen.y
+            };
+
+            let bottom = bottom_ankle + width / 10.0;
             draw_list
                 .add_rect([left, top], [right, bottom], col)
                 .thickness(2.0)
