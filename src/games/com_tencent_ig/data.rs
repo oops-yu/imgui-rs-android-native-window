@@ -71,9 +71,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
 
     let (actors_addr, actors_count) =
         game_mem.read_with_offsets::<(u64, i32)>(ulevel, offsets::OBJARR);
-    // println!(
-    //     "ue4:{ue4:#016x}\nuworld:{uworld:#016x}\ngname:{gname:#016x}\nulevel:{ulevel:#016x}\n"
-    // );
+
     if actors_count <= 0 || actors_count > 2000 {
         return;
     }
@@ -92,10 +90,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
     game_data.local_team_id = game_mem.read_with_offsets(game_data.local_player, offsets::TEAMID);
 
     game_data.players.clear();
-    //read player array
-    // for i in 0..actors_count {
-    //     game_data.actor_array[i as usize] = game_mem.read_with_offsets(actors_addr, &[(i*8) as u64])
-    // }
+
     game_mem.read_memory_with_length_and_offsets(
         actors_addr,
         game_data.actor_array.as_mut_ptr() as _,
@@ -218,110 +213,110 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &game_data.matrix,
             );
 
-            let pelvis: FTransform = game_mem.read_with_offsets(mesh, offsets::PELVIS);
+            // let pelvis: FTransform = game_mem.read_with_offsets(mesh, offsets::PELVIS);
 
-            get_bone_pos(
-                &pelvis,
-                &c2w_trans,
-                &mut current_player.pelvis,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &pelvis,
+            //     &c2w_trans,
+            //     &mut current_player.pelvis,
+            //     &game_data.matrix,
+            // );
 
-            if current_player.max_health != 1000.0 {
-                game_mem.set_additional_offset(48 * 2, true);
-            }
+            // if current_player.max_health != 1000.0 {
+            //     game_mem.set_additional_offset(48 * 2, true);
+            // }
 
-            let left_shoulder: FTransform =
-                game_mem.read_with_offsets(mesh, offsets::LEFT_SHOULDER);
+            // let left_shoulder: FTransform =
+            //     game_mem.read_with_offsets(mesh, offsets::LEFT_SHOULDER);
 
-            get_bone_pos(
-                &left_shoulder,
-                &c2w_trans,
-                &mut current_player.left_shoulder,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &left_shoulder,
+            //     &c2w_trans,
+            //     &mut current_player.left_shoulder,
+            //     &game_data.matrix,
+            // );
 
-            let right_shoulder: FTransform =
-                game_mem.read_with_offsets(mesh, offsets::RIGHT_SHOULDER);
+            // let right_shoulder: FTransform =
+            //     game_mem.read_with_offsets(mesh, offsets::RIGHT_SHOULDER);
 
-            get_bone_pos(
-                &right_shoulder,
-                &c2w_trans,
-                &mut current_player.right_shoulder,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &right_shoulder,
+            //     &c2w_trans,
+            //     &mut current_player.right_shoulder,
+            //     &game_data.matrix,
+            // );
 
-            let left_elbow: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ELBOW);
+            // let left_elbow: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ELBOW);
 
-            get_bone_pos(
-                &left_elbow,
-                &c2w_trans,
-                &mut current_player.left_elbow,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &left_elbow,
+            //     &c2w_trans,
+            //     &mut current_player.left_elbow,
+            //     &game_data.matrix,
+            // );
 
-            let right_elbow: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ELBOW);
+            // let right_elbow: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ELBOW);
 
-            get_bone_pos(
-                &right_elbow,
-                &c2w_trans,
-                &mut current_player.right_elbow,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &right_elbow,
+            //     &c2w_trans,
+            //     &mut current_player.right_elbow,
+            //     &game_data.matrix,
+            // );
 
-            let left_wrist: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_WRIST);
+            // let left_wrist: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_WRIST);
 
-            get_bone_pos(
-                &left_wrist,
-                &c2w_trans,
-                &mut current_player.left_wrist,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &left_wrist,
+            //     &c2w_trans,
+            //     &mut current_player.left_wrist,
+            //     &game_data.matrix,
+            // );
 
-            let right_wrist: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_WRIST);
+            // let right_wrist: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_WRIST);
 
-            get_bone_pos(
-                &right_wrist,
-                &c2w_trans,
-                &mut current_player.right_wrist,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &right_wrist,
+            //     &c2w_trans,
+            //     &mut current_player.right_wrist,
+            //     &game_data.matrix,
+            // );
 
-            let left_thigh: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_THIGH);
+            // let left_thigh: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_THIGH);
 
-            get_bone_pos(
-                &left_thigh,
-                &c2w_trans,
-                &mut current_player.left_thigh,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &left_thigh,
+            //     &c2w_trans,
+            //     &mut current_player.left_thigh,
+            //     &game_data.matrix,
+            // );
 
-            let right_thigh: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGTH_THIGH);
+            // let right_thigh: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGTH_THIGH);
 
-            get_bone_pos(
-                &right_thigh,
-                &c2w_trans,
-                &mut current_player.right_thigh,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &right_thigh,
+            //     &c2w_trans,
+            //     &mut current_player.right_thigh,
+            //     &game_data.matrix,
+            // );
 
-            let left_knee: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_KNEE);
+            // let left_knee: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_KNEE);
 
-            get_bone_pos(
-                &left_knee,
-                &c2w_trans,
-                &mut current_player.left_knee,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &left_knee,
+            //     &c2w_trans,
+            //     &mut current_player.left_knee,
+            //     &game_data.matrix,
+            // );
 
-            let right_knee: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_KNEE);
+            // let right_knee: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_KNEE);
 
-            get_bone_pos(
-                &right_knee,
-                &c2w_trans,
-                &mut current_player.right_knee,
-                &game_data.matrix,
-            );
+            // get_bone_pos(
+            //     &right_knee,
+            //     &c2w_trans,
+            //     &mut current_player.right_knee,
+            //     &game_data.matrix,
+            // );
 
             let left_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ANKLE);
 
