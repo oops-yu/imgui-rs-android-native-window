@@ -86,8 +86,8 @@ pub struct FTransform {
 pub struct Bone {
     pub world_position: Vec3, // 世界坐标
     pub position_on_screen: Vec2,
-    // for searching bones
-    // pub name_for_debug:String // 屏幕坐标
+    #[cfg(feature = "debug_bones")]
+    pub name_for_debug:String 
 }
 #[repr(C)]
 #[derive(Default, Debug)]
@@ -125,8 +125,8 @@ pub struct Player {
     pub right_knee: Bone,
     pub left_ankle: Bone,
     pub right_ankle: Bone,
-    //for searhing bones
-    //pub bone_debug:Vec<Bone>
+    #[cfg(feature = "debug_bones")]
+    pub bone_debug:Vec<Bone>
 }
 impl Player {
     pub fn position_valid(&self) -> bool {
