@@ -346,7 +346,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             game_mem.un_set_additional_offset();
             #[cfg(feature = "debug_bones")]
             {
-                for i in 0..70 {
+                for i in 0..61 {
                     let bone: FTransform = game_mem.read_with_offsets(mesh, &[48 * i as u64]);
                     let mut bone1: Bone = Bone::default();
                     get_bone_pos(&bone, &c2w_trans, &mut bone1, &game_data.matrix);
