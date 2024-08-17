@@ -5,12 +5,12 @@ use super::data_types::*;
 
 pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
     let draw_list = ui.get_background_draw_list();
-    
+
     for player in &game_data.players {
         if player.is_in_screen() {
-            let font_scale:f32 = 0.8;
-            let white = [1.0, 1.0, 1.0,0.74];
-            let yellow = [1.0,1.0,0.0,0.74];
+            let font_scale: f32 = 0.8;
+            let white = [1.0, 1.0, 1.0, 0.74];
+            let yellow = [1.0, 1.0, 0.0, 0.74];
             let Player {
                 width,
                 head,
@@ -55,18 +55,26 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 .thickness(2.0)
                 .build();
             //血量
-            if player.health_percentage != 1.0{
-                draw_list.add_line([right+3.0,bottom],[right+3.0,(top+(bottom-top)*(1.0-player.health_percentage))],[1.0,0.0,0.0]).thickness(2.0).build();
+            if player.health_percentage != 1.0 {
+                draw_list
+                    .add_line(
+                        [right + 3.0, bottom],
+                        [
+                            right + 3.0,
+                            (top + (bottom - top) * (1.0 - player.health_percentage)),
+                        ],
+                        [1.0, 0.0, 0.0],
+                    )
+                    .thickness(2.0)
+                    .build();
             }
-            
-            
+
             //距离
-            let distance = format!("{:.0}m",player.distance_to_player);
+            let distance = format!("{:.0}m", player.distance_to_player);
             let mut distance_text_size = ui.calc_text_size(&distance);
 
-
-            distance_text_size[0]*=font_scale;
-            distance_text_size[1]*=font_scale;
+            distance_text_size[0] *= font_scale;
+            distance_text_size[1] *= font_scale;
             draw_list.add_text_with_font_size(
                 [
                     head.position_on_screen.x - (distance_text_size[0] / 2.0),
@@ -74,18 +82,18 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 ],
                 white,
                 distance,
-                distance_text_size[1]
+                distance_text_size[1],
             );
-            top -=distance_text_size[1];
+            top -= distance_text_size[1];
             let name = if player.is_bot {
                 "BOT"
             } else {
                 player.get_name()
             };
             let mut name_text_size = ui.calc_text_size(&name);
-            
-            name_text_size[0]*=font_scale;
-            name_text_size[1]*=font_scale;
+
+            name_text_size[0] *= font_scale;
+            name_text_size[1] *= font_scale;
             draw_list.add_text_with_font_size(
                 [
                     head.position_on_screen.x - (name_text_size[0] / 2.0),
@@ -93,13 +101,17 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 ],
                 yellow,
                 name,
-                name_text_size[1]
+                name_text_size[1],
             );
             //射线
-            draw_list.add_line([1200.0,0.0], [
-                head.position_on_screen.x,
-                top - name_text_size[1],
-            ], white).thickness(2.0).build();
+            draw_list
+                .add_line(
+                    [1200.0, 0.0],
+                    [head.position_on_screen.x, top - name_text_size[1]],
+                    white,
+                )
+                .thickness(2.0)
+                .build();
         }
     }
 }

@@ -133,13 +133,14 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         }
         let mut current_player = Player::default();
         //是否同队
-        #[cfg(not(feature = "debug_bones"))]{
-        current_player.team_id = game_mem.read_with_offsets(current_actor, offsets::TEAMID);
-        if current_player.team_id == game_data.local_team_id {
-            game_data.local_team_set.insert(current_actor);
-            continue;
+        #[cfg(not(feature = "debug_bones"))]
+        {
+            current_player.team_id = game_mem.read_with_offsets(current_actor, offsets::TEAMID);
+            if current_player.team_id == game_data.local_team_id {
+                game_data.local_team_set.insert(current_actor);
+                continue;
+            }
         }
-    }
 
         game_mem.read_memory_with_offsets(
             uk0x1b0,
@@ -155,9 +156,11 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             game_mem.read_with_offsets::<(f32, f32)>(current_actor, offsets::HEALTH);
         current_player.health_percentage = health / max_health;
         current_player.max_health = max_health;
-        
+
         //距离
-        current_player.distance_to_player = game_data.local_position.to_other_distance(&current_player.world_position, 0.01);
+        current_player.distance_to_player = game_data
+            .local_position
+            .to_other_distance(&current_player.world_position, 0.01);
 
         //头甲包
 
@@ -222,8 +225,8 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             if current_player.max_health != 1000.0 {
                 game_mem.set_additional_offset(48 * 2, true);
             }
-           
-            let ground_contact:FTransform = game_mem.read_with_offsets(mesh, offsets::J8);
+
+            let ground_contact: FTransform = game_mem.read_with_offsets(mesh, offsets::J8);
             get_bone_pos(
                 &ground_contact,
                 &c2w_trans,
@@ -344,9 +347,10 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                     &mut current_player.left_ankle,
                     &game_data.matrix,
                 );
-    
-                let right_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
-    
+
+                let right_ankle: FTransform =
+                    game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
+
                 get_bone_pos(
                     &right_ankle,
                     &c2w_trans,
@@ -361,8 +365,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                     let bone: FTransform = game_mem.read_with_offsets(mesh, &[48 * i as u64]);
                     let mut bone1: Bone = Bone::default();
                     get_bone_pos(&bone, &c2w_trans, &mut bone1, &game_data.matrix);
-                    
-                    
+
                     bone1.name_for_debug = i.to_string();
                     current_player.bone_debug.push(bone1);
                 }
