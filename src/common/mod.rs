@@ -128,12 +128,7 @@ impl<A: App> System<A> {
         let _ = f.read_to_end(&mut buf);
         let font_size = (13.0 * 3.0) as f32;
         imgui.fonts().add_font(&[
-            // FontSource::DefaultFontData {
-            //     config: Some(FontConfig {
-            //         size_pixels: font_size,
-            //         ..FontConfig::default()
-            //     }),
-            // },
+
             FontSource::TtfData {
                 data: &buf,
                 size_pixels: font_size,
@@ -143,24 +138,20 @@ impl<A: App> System<A> {
                     ..FontConfig::default()
                 }),
             },
+            
+        ]);
+        let small_font = imgui.fonts().add_font(&[
+
             FontSource::TtfData {
                 data: &buf,
-                size_pixels: font_size,
+                size_pixels: 13.0,
                 config: Some(FontConfig {
                     rasterizer_multiply: 1.75,
-                    glyph_ranges: FontGlyphRanges::japanese(),
+                    glyph_ranges: FontGlyphRanges::chinese_full(),
                     ..FontConfig::default()
                 }),
             },
-            FontSource::TtfData {
-                data: &buf,
-                size_pixels: font_size,
-                config: Some(FontConfig {
-                    rasterizer_multiply: 1.75,
-                    glyph_ranges: FontGlyphRanges::korean(),
-                    ..FontConfig::default()
-                }),
-            },
+            
         ]);
 
         let display_info = android_native_window::safe_get_display_info();
