@@ -429,11 +429,10 @@ impl<A: App> System<A> {
             };
             match present_result {
                 Ok(is_suboptimal) if is_suboptimal => {
-                    // log::error!("111");
-                    // dirty_swapchain = true;
+
                 }
                 Err(vk::Result::ERROR_OUT_OF_DATE_KHR) => {
-                    log::error!("222");
+
                     dirty_swapchain = true;
                 }
                 Err(error) => panic!("Failed to present queue. Cause: {}", error),
