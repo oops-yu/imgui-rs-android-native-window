@@ -127,32 +127,24 @@ impl<A: App> System<A> {
         let mut buf: Vec<u8> = Vec::new();
         let _ = f.read_to_end(&mut buf);
         let font_size = (13.0 * 3.0) as f32;
-        imgui.fonts().add_font(&[
-
-            FontSource::TtfData {
-                data: &buf,
-                size_pixels: font_size,
-                config: Some(FontConfig {
-                    rasterizer_multiply: 1.75,
-                    glyph_ranges: FontGlyphRanges::chinese_full(),
-                    ..FontConfig::default()
-                }),
-            },
-            
-        ]);
-        let small_font = imgui.fonts().add_font(&[
-
-            FontSource::TtfData {
-                data: &buf,
-                size_pixels: 13.0,
-                config: Some(FontConfig {
-                    rasterizer_multiply: 1.75,
-                    glyph_ranges: FontGlyphRanges::chinese_full(),
-                    ..FontConfig::default()
-                }),
-            },
-            
-        ]);
+        imgui.fonts().add_font(&[FontSource::TtfData {
+            data: &buf,
+            size_pixels: font_size,
+            config: Some(FontConfig {
+                rasterizer_multiply: 1.75,
+                glyph_ranges: FontGlyphRanges::chinese_full(),
+                ..FontConfig::default()
+            }),
+        }]);
+        let small_font = imgui.fonts().add_font(&[FontSource::TtfData {
+            data: &buf,
+            size_pixels: 13.0,
+            config: Some(FontConfig {
+                rasterizer_multiply: 1.75,
+                glyph_ranges: FontGlyphRanges::chinese_full(),
+                ..FontConfig::default()
+            }),
+        }]);
 
         let display_info = android_native_window::safe_get_display_info();
 
@@ -419,11 +411,8 @@ impl<A: App> System<A> {
                     .queue_present(vulkan_context.present_queue, &present_info)
             };
             match present_result {
-                Ok(is_suboptimal) if is_suboptimal => {
-
-                }
+                Ok(is_suboptimal) if is_suboptimal => {}
                 Err(vk::Result::ERROR_OUT_OF_DATE_KHR) => {
-
                     dirty_swapchain = true;
                 }
                 Err(error) => panic!("Failed to present queue. Cause: {}", error),

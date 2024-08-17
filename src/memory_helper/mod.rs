@@ -58,7 +58,6 @@ impl GameMem {
         loop {
             match get_name_pid(process_name) {
                 Ok(pid) => {
-                    println!("get a pid{}", pid);
                     self.pid = pid;
                     break;
                 }

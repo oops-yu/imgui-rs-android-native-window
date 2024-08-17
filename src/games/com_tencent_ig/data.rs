@@ -212,6 +212,24 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &mut current_player.chest,
                 &game_data.matrix,
             );
+
+            let left_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ANKLE);
+
+            get_bone_pos(
+                &left_ankle,
+                &c2w_trans,
+                &mut current_player.left_ankle,
+                &game_data.matrix,
+            );
+
+            let right_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
+
+            get_bone_pos(
+                &right_ankle,
+                &c2w_trans,
+                &mut current_player.right_ankle,
+                &game_data.matrix,
+            );
             #[cfg(feature = "draw_all_bones")]
             {
                 let pelvis: FTransform = game_mem.read_with_offsets(mesh, offsets::PELVIS);
@@ -319,25 +337,6 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                     &right_knee,
                     &c2w_trans,
                     &mut current_player.right_knee,
-                    &game_data.matrix,
-                );
-
-                let left_ankle: FTransform = game_mem.read_with_offsets(mesh, offsets::LEFT_ANKLE);
-
-                get_bone_pos(
-                    &left_ankle,
-                    &c2w_trans,
-                    &mut current_player.left_ankle,
-                    &game_data.matrix,
-                );
-
-                let right_ankle: FTransform =
-                    game_mem.read_with_offsets(mesh, offsets::RIGHT_ANKLE);
-
-                get_bone_pos(
-                    &right_ankle,
-                    &c2w_trans,
-                    &mut current_player.right_ankle,
                     &game_data.matrix,
                 );
             }

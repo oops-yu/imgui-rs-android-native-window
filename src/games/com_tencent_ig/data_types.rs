@@ -87,7 +87,7 @@ pub struct Bone {
     pub world_position: Vec3, // 世界坐标
     pub position_on_screen: Vec2,
     #[cfg(feature = "debug_bones")]
-    pub name_for_debug:String 
+    pub name_for_debug: String,
 }
 #[repr(C)]
 #[derive(Default, Debug)]
@@ -126,7 +126,7 @@ pub struct Player {
     pub left_ankle: Bone,
     pub right_ankle: Bone,
     #[cfg(feature = "debug_bones")]
-    pub bone_debug:Vec<Bone>
+    pub bone_debug: Vec<Bone>,
 }
 impl Player {
     pub fn position_valid(&self) -> bool {
