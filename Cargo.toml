@@ -32,5 +32,6 @@ nohash-hasher = "0.2.0"
 default =[]
 
 debug_bones =[]
+draw_all_bones=[]
 
 

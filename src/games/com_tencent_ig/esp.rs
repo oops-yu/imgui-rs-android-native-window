@@ -64,7 +64,6 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 [1.0, 1.0, 1.0],
                 name,
             );
-            
         }
     }
 }
