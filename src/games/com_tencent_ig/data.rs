@@ -239,6 +239,14 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
                 &mut current_player.right_ankle,
                 &game_data.matrix,
             );
+            let j8:FTransform = game_mem.read_with_offsets(mesh, offsets::J8);
+            get_bone_pos(
+                &j8,
+                &c2w_trans,
+                &mut current_player.jb,
+                &game_data.matrix,
+            );
+
             #[cfg(feature = "draw_all_bones")]
             {
                 let pelvis: FTransform = game_mem.read_with_offsets(mesh, offsets::PELVIS);
@@ -348,7 +356,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             game_mem.un_set_additional_offset();
             #[cfg(feature = "debug_bones")]
             {
-                for i in 0..61 {
+                for i in 68..70 {
                     let bone: FTransform = game_mem.read_with_offsets(mesh, &[48 * i as u64]);
                     let mut bone1: Bone = Bone::default();
                     get_bone_pos(&bone, &c2w_trans, &mut bone1, &game_data.matrix);
