@@ -1,4 +1,3 @@
-
 macro_rules! define_offsets {
     ($($name:ident : $value:expr),*) => {
         $(
@@ -6,7 +5,6 @@ macro_rules! define_offsets {
         )*
     };
 }
-
 
 define_offsets!(
     UWORLD: [0xCB39300, 0x20],

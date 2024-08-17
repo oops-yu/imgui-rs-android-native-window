@@ -1,17 +1,15 @@
 #[repr(C)]
 #[derive(Default, Debug)]
 pub struct Quat {
-    
     pub x: f32,
 
     pub y: f32,
-    
+
     pub z: f32,
     pub w: f32,
-
 }
 impl Quat {
-   pub fn conjugate(&self) -> Quat {
+    pub fn conjugate(&self) -> Quat {
         Quat {
             w: self.w,
             x: -self.x,
@@ -20,7 +18,7 @@ impl Quat {
         }
     }
 
-  pub  fn multiply(&self, other: &Quat) -> Quat {
+    pub fn multiply(&self, other: &Quat) -> Quat {
         Quat {
             w: self.w * other.w - self.x * other.x - self.y * other.y - self.z * other.z,
             x: self.w * other.x + self.x * other.w + self.y * other.z - self.z * other.y,
@@ -29,7 +27,7 @@ impl Quat {
         }
     }
 
-   pub fn rotate_vec(&self, vec: &Vec3) -> Vec3 {
+    pub fn rotate_vec(&self, vec: &Vec3) -> Vec3 {
         let vec_quat = Quat {
             w: 0.0,
             x: vec.x,
@@ -47,31 +45,31 @@ impl Quat {
     }
 }
 #[repr(C)]
-#[derive(Default, Debug,Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
 }
-impl Vec3{
-    pub fn translate(&self,other:&Self)->Self{
-        Self{
-            x:self.x+other.x,
-            y:self.y+other.y,
-            z:self.z+other.z
+impl Vec3 {
+    pub fn translate(&self, other: &Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
         }
     }
 }
 
 #[repr(C)]
-#[derive(Default, Debug,Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
 impl Vec2 {
-    pub fn to_pos(&self)->[f32;2]{
-        [self.x,self.y]
+    pub fn to_pos(&self) -> [f32; 2] {
+        [self.x, self.y]
     }
 }
 
@@ -84,31 +82,31 @@ pub struct FTransform {
     pub scale_3d: Vec3, // 3D 缩放向量
 }
 #[repr(C)]
-#[derive(Default, Debug,Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Bone {
-    pub world_position: Vec3,     // 世界坐标
+    pub world_position: Vec3, // 世界坐标
     pub position_on_screen: Vec2,
-   // for searching bones
-   // pub name_for_debug:String // 屏幕坐标
+    // for searching bones
+    // pub name_for_debug:String // 屏幕坐标
 }
 #[repr(C)]
 #[derive(Default, Debug)]
 pub struct Player {
-    pub width: f32,              // 人物宽度
-    pub world_position: Vec3,    // 世界坐标
-    pub screen_position: Vec2,   // 屏幕坐标
-    pub camera_angle: f32,       // 人物相机
-    pub team_id: i32,            // 队标
-    pub action_id: i32,          // 动作
-    pub weapon_id: i32,          // 手持
-    pub bullet_count: i32,       // 子弹
-    pub max_bullets: i32,        // 最大子弹
-    pub backpack: i32,           // 背包
-    pub helmet: i32,             // 头盔
-    pub armor: i32,              // 敌人甲
-    pub is_bot: bool,            // 人机
-    pub health_percentage: f32,  // 血量百分比
-    pub max_health:f32,
+    pub width: f32,             // 人物宽度
+    pub world_position: Vec3,   // 世界坐标
+    pub screen_position: Vec2,  // 屏幕坐标
+    pub camera_angle: f32,      // 人物相机
+    pub team_id: i32,           // 队标
+    pub action_id: i32,         // 动作
+    pub weapon_id: i32,         // 手持
+    pub bullet_count: i32,      // 子弹
+    pub max_bullets: i32,       // 最大子弹
+    pub backpack: i32,          // 背包
+    pub helmet: i32,            // 头盔
+    pub armor: i32,             // 敌人甲
+    pub is_bot: bool,           // 人机
+    pub health_percentage: f32, // 血量百分比
+    pub max_health: f32,
     pub distance_to_player: f32, // 距离
     pub player_name: [u8; 32],   // 玩家名称，字符数组需要转为字节数组
     pub velocity: Vec3,          // 速度
@@ -138,6 +136,10 @@ impl Player {
     }
     pub fn is_in_screen(&self) -> bool {
         self.camera_angle > 0.0
+            && self.screen_position.x >= 0.0
+            && self.screen_position.y >= 0.0
+            && self.screen_position.x <= 2400.0
+            && self.screen_position.y <= 1080.0
     }
     pub fn get_name<'a>(&'a self) -> &'a str {
         // 查找0x00的位置

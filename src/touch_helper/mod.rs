@@ -58,7 +58,6 @@ impl Touch {
             is_down: false,
             pos: (0.0, 0.0),
         });
-
         let least_finger_idx: usize = 0;
         Self {
             device,
