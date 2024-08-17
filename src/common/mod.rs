@@ -136,15 +136,6 @@ impl<A: App> System<A> {
                 ..FontConfig::default()
             }),
         }]);
-        let small_font = imgui.fonts().add_font(&[FontSource::TtfData {
-            data: &buf,
-            size_pixels: 13.0,
-            config: Some(FontConfig {
-                rasterizer_multiply: 1.75,
-                glyph_ranges: FontGlyphRanges::chinese_full(),
-                ..FontConfig::default()
-            }),
-        }]);
 
         let display_info = android_native_window::safe_get_display_info();
 
@@ -155,7 +146,6 @@ impl<A: App> System<A> {
         };
 
         imgui.io_mut().display_size = [res as f32, res as f32];
-
         #[cfg(feature = "gpu-allocator")]
         let renderer = {
             let allocator = Allocator::new(&AllocatorCreateDesc {
@@ -803,10 +793,10 @@ fn create_vulkan_swapchain(
                 )?
         };
 
-        if present_modes.contains(&vk::PresentModeKHR::IMMEDIATE) {
-            vk::PresentModeKHR::IMMEDIATE
-        } else {
+        if present_modes.contains(&vk::PresentModeKHR::MAILBOX) {
             vk::PresentModeKHR::MAILBOX
+        } else {
+            vk::PresentModeKHR::FIFO
         }
     };
     log::debug!("Swapchain present mode: {present_mode:?}");

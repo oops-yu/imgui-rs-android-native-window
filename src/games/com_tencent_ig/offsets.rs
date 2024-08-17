@@ -19,7 +19,7 @@ define_offsets!(
     ISAIMING:[0x1030],
     OBJTYPE:[0x27d8],
     UK0X1B0:[0x1B0],
-    UK0XF60:[0xF60],
+    STATE:[0xF60],
     UK0X1C0:[0x1C0],
     TEAMID:[0x928],
     HEALTH:[0xda0],
@@ -44,6 +44,7 @@ define_offsets!(
     LEFT_KNEE:[(56) * 48],
     RIGHT_KNEE:[(60) * 48],
     LEFT_ANKLE:[(57) * 48],
-    RIGHT_ANKLE:[(61) * 48]
+    RIGHT_ANKLE:[(61) * 48],
+    WEAPON:[0x22B8, 0x500, 0x838, 0x178]
 
 );

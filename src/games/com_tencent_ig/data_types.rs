@@ -59,6 +59,12 @@ impl Vec3 {
             z: self.z + other.z,
         }
     }
+    pub fn to_other_distance(&self,other:&Self,scale_factor:f32)->f32{
+        let delta_x = self.x-other.x;
+        let delta_y = self.y-other.y;
+        let delta_z = self.z-other.z;
+        (delta_x*delta_x+delta_y*delta_y+delta_z*delta_z).sqrt()*scale_factor
+    }
 }
 
 #[repr(C)]

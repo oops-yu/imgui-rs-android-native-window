@@ -1,4 +1,4 @@
-use imgui::Ui;
+use imgui::{FontId, StyleVar, Ui};
 
 use super::data::GameData;
 use super::data_types::*;
@@ -41,9 +41,9 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                         .build();
                 }
             }
-
-            let left = head.position_on_screen.x - width * 0.6;
-            let right = head.position_on_screen.x + width * 0.6;
+            //框
+            let left = head.position_on_screen.x - width * 0.8;
+            let right = head.position_on_screen.x + width * 0.8;
             let top = head.position_on_screen.y - width / 5.0;
             let bottom_ankle = if left_ankle.position_on_screen.y > right_ankle.position_on_screen.y
             {
@@ -57,20 +57,34 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 .add_rect([left, top], [right, bottom], col)
                 .thickness(2.0)
                 .build();
+            //血量
+            draw_list.add_line([right+3.0,bottom],[right+3.0,(top+(bottom-top)*(1.0-player.health_percentage))],[1.0,0.0,0.0]).thickness(2.0).build();
+
+            
+            //名字+距离
             let name = if player.is_bot {
-                format!("bot {}", player.max_health)
+                format!("bot {}m", player.distance_to_player as u32)
             } else {
-                format!("{} {}", player.get_name(), player.max_health)
+                format!("{} {}m", player.get_name(), player.distance_to_player as u32)
             };
-            let text_size = ui.calc_text_size(&name);
-            draw_list.add_text(
+            let mut text_size = ui.calc_text_size(&name);
+            let font_scale:f32 = 0.8;
+            text_size[0]*=font_scale;
+            text_size[1]*=font_scale;
+            draw_list.add_text_with_font_size(
                 [
                     head.position_on_screen.x - (text_size[0] / 2.0),
                     top - text_size[1],
                 ],
-                [1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0,0.5],
                 name,
+                text_size[1]
             );
+            //射线
+            draw_list.add_line([1200.0,0.0], [
+                head.position_on_screen.x,
+                top - text_size[1],
+            ], col).thickness(2.0).build();
         }
     }
 }

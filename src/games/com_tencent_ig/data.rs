@@ -89,6 +89,8 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
     game_data.aiming = game_mem.read_with_offsets(game_data.local_player, offsets::ISAIMING);
     game_data.local_team_id = game_mem.read_with_offsets(game_data.local_player, offsets::TEAMID);
 
+    // let state = game_mem.read_with_offsets::<i32>(game_data.local_player, offsets::WEAPON);
+    // println!("{state}");
     game_data.players.clear();
 
     game_mem.read_memory_with_length_and_offsets(
@@ -125,8 +127,8 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         {
             continue;
         }
-        let uk0xf60 = game_mem.read_with_offsets::<i32>(current_actor, offsets::UK0XF60);
-        if uk0xf60 == 262144 || uk0xf60 == 262152 {
+        let state = game_mem.read_with_offsets::<i32>(current_actor, offsets::STATE);
+        if state == 262144 || state == 262152 {
             continue;
         }
         let mut current_player = Player::default();
@@ -149,8 +151,11 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         // //血量
         let (health, max_health) =
             game_mem.read_with_offsets::<(f32, f32)>(current_actor, offsets::HEALTH);
-        current_player.health_percentage = health / max_health * 100.0;
+        current_player.health_percentage = health / max_health;
         current_player.max_health = max_health;
+        
+        //距离
+        current_player.distance_to_player = game_data.local_position.to_other_distance(&current_player.world_position, 0.01);
 
         //头甲包
 

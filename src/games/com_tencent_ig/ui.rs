@@ -21,7 +21,7 @@ pub fn gen_user_interface(opened: &mut bool, ui: &mut Ui, frame_rate: &mut f32) 
             ui.same_line();
             ui.radio_button("60", frame_rate, 60.0);
             ui.same_line();
-            ui.radio_button("90", frame_rate, 90.0);
+            ui.radio_button("90", frame_rate, 91.0);
             ui.same_line();
             ui.radio_button("120", frame_rate, 120.0);
             ui.same_line();
