@@ -27,18 +27,21 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 right_ankle,
                 ..
             } = player;
-            // for searching bones
-            // for i in &player.bone_debug {
-            //     let pos = i.position_on_screen.to_pos();
-            //     let col = [1.0, 1.0, 1.0];
+            #[cfg(feature = "debug_bones")]
+            {
+                for i in &player.bone_debug {
+                    let pos = i.position_on_screen.to_pos();
+                    let col = [1.0, 1.0, 1.0];
 
-            //     draw_list.add_text(pos, col, i.name_for_debug.clone());
-            //     draw_list
-            //         .add_circle(pos, 10.0, col)
-            //         .filled(true)
-            //         .thickness(5.0)
-            //         .build();
-            // }
+                    draw_list.add_text(pos, col, i.name_for_debug.clone());
+                    draw_list
+                        .add_circle(pos, 10.0, col)
+                        .filled(true)
+                        .thickness(5.0)
+                        .build();
+                }
+            }
+
             let left = head.position_on_screen.x - width * 0.6;
             let right = head.position_on_screen.x + width * 0.6;
             let top = head.position_on_screen.y - width / 5.0;
@@ -61,53 +64,7 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                 [1.0, 1.0, 1.0],
                 name,
             );
-            //绘制骨骼
-            //绘制点
-            // let radius = 3.0;
-            // let color = col;
-            // draw_list.add_circle(head.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(chest.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(pelvis.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(left_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(right_shoulder.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(left_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(right_elbow.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(left_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(right_wrist.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(left_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(right_thigh.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(left_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(right_knee.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(left_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
-            // draw_list.add_circle(right_ankle.position_on_screen.to_pos(), radius, color).filled(true).build();
-            //绘制骨骼
-            // let c = col;
-            // //chest -> left_shoulder
-            // draw_list.add_line(chest.position_on_screen.to_pos(), left_shoulder.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //chest -> right_shoulder
-            // draw_list.add_line(chest.position_on_screen.to_pos(), right_shoulder.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //left_shoulder->left_elbow
-            // draw_list.add_line(left_shoulder.position_on_screen.to_pos(), left_elbow.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //left_elbow->left_wrist
-            // draw_list.add_line(left_elbow.position_on_screen.to_pos(), left_wrist.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //right_shoulder->right_elbow
-            // draw_list.add_line(right_shoulder.position_on_screen.to_pos(), right_elbow.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //right_elbow->right_wrist
-            // draw_list.add_line(right_elbow.position_on_screen.to_pos(), right_wrist.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //chest -> pelvis
-            // draw_list.add_line(chest.position_on_screen.to_pos(), pelvis.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //pelvis -> left_thigh
-            // draw_list.add_line(pelvis.position_on_screen.to_pos(), left_thigh.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //pelvis -> right_thigh
-            // draw_list.add_line(pelvis.position_on_screen.to_pos(), right_thigh.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //left_thigh -> left_knee
-            // draw_list.add_line(left_thigh.position_on_screen.to_pos(), left_knee.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //left_knee -> left_ankle
-            // draw_list.add_line(left_knee.position_on_screen.to_pos(), left_ankle.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //right_thigh -> right_knee
-            // draw_list.add_line(right_thigh.position_on_screen.to_pos(), right_knee.position_on_screen.to_pos(), c).thickness(2.0).build();
-            // //right_knee -> right_ankle
-            // draw_list.add_line(right_knee.position_on_screen.to_pos(), right_ankle.position_on_screen.to_pos(), c).thickness(2.0).build();
+            
         }
     }
 }
