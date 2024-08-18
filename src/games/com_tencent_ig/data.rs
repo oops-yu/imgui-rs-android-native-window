@@ -192,7 +192,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
 
         world_to_screen(
             &mut current_player.screen_position,
-            &mut current_player.camera_angle,
+            &mut current_player.depth_in_camera,
             &mut current_player.width,
             &current_player.world_position,
             &game_data.matrix,
