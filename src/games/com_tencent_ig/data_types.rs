@@ -26,7 +26,22 @@ impl Quat {
             z: self.w * other.z + self.x * other.y - self.y * other.x + self.z * other.w,
         }
     }
-
+    pub fn multiply_pre(&self,other:&Quat)->Quat{
+        Quat {
+            w:   - self.z * other.z,
+            x: self.w * other.x  - self.z * other.y,
+            y: self.w * other.y  + self.z * other.x,
+            z: self.w * other.z  ,
+        }
+    }
+    pub fn multiply_next(&self,other:&Quat)->Quat{
+        Quat {
+            w: self.w * other.w  - self.z * other.z,
+            x:   self.x * other.w + self.y * other.z ,
+            y:   self.x * other.z + self.y * other.w ,
+            z: self.w * other.z   + self.z * other.w,
+        }
+    }
     pub fn rotate_vec(&self, vec: &Vec3) -> Vec3 {
         let vec_quat = Quat {
             w: 0.0,
@@ -34,8 +49,8 @@ impl Quat {
             y: vec.y,
             z: vec.z,
         };
-
-        let rotated_quat = self.multiply(&vec_quat).multiply(&self.conjugate());
+        
+        let rotated_quat = self.multiply_pre(&vec_quat).multiply_next(&self.conjugate());
 
         Vec3 {
             x: rotated_quat.x,
@@ -162,6 +177,7 @@ impl Player {
         // 将子切片转换为 &str
         std::str::from_utf8(utf8_slice).expect("Invalid UTF-8 sequence")
     }
+    
 }
 #[repr(C)]
 pub struct Supply {

@@ -4,7 +4,7 @@ static mut OLDULEVEL: u64 = 0;
 static mut OLDGNAME: u64 = 0;
 #[allow(unused_imports)]
 use super::data_types::*;
-use nohash_hasher::IntSet;
+use nohash_hasher::{IntSet,IntMap};
 pub struct GameData {
     pub local_player: u64,
     pub local_team_id: i32,
@@ -22,6 +22,7 @@ pub struct GameData {
     pub local_team_set: IntSet<u64>,
     pub actor_array: [u64; 2000],
 }
+
 impl Default for GameData {
     fn default() -> Self {
         Self {
@@ -62,7 +63,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             game_data.non_player_set.clear();
             game_data.players_set.clear();
             game_data.local_team_set.clear();
-
+            
             OLDUWORLD = uworld;
             OLDGNAME = gname;
             OLDULEVEL = ulevel;
@@ -99,6 +100,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
         actors_count as usize * 8,
         &[],
     );
+
     for i in 0..actors_count {
         let current_actor = game_data.actor_array[i as usize];
         if game_data.local_team_set.contains(&current_actor) {
@@ -132,6 +134,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             continue;
         }
         let mut current_player = Player::default();
+        
         //是否同队
         #[cfg(not(feature = "debug_bones"))]
         {
@@ -142,6 +145,7 @@ pub fn prepare_data(game_mem: &mut GameMem, game_data: &mut GameData) {
             }
         }
 
+        
         game_mem.read_memory_with_offsets(
             uk0x1b0,
             &mut current_player.world_position,

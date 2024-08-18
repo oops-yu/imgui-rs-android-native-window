@@ -94,8 +94,8 @@ pub fn esp(ui: &mut Ui, game_data: &mut GameData) {
                     .build();
             }
 
-            //距离
-            let distance = format!("{:.0}m", player.distance_to_player);
+            //队伍+距离
+            let distance = format!("[{}]{:.0}m",player.team_id, player.distance_to_player);
             let mut distance_text_size = ui.calc_text_size(&distance);
 
             distance_text_size[0] *= font_scale;
