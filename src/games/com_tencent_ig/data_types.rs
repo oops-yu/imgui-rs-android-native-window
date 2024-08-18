@@ -116,7 +116,7 @@ pub struct Player {
     pub width: f32,             // 人物宽度
     pub world_position: Vec3,   // 世界坐标
     pub screen_position: Vec2,  // 屏幕坐标
-    pub camera_angle: f32,      // 人物相机
+    pub depth_in_camera: f32,      // 人物在相机中的深度相机
     pub team_id: i32,           // 队标
     pub action_id: i32,         // 动作
     pub weapon_id: i32,         // 手持
@@ -157,11 +157,7 @@ impl Player {
             && self.world_position.z == 0.0)
     }
     pub fn is_in_screen(&self) -> bool {
-        self.camera_angle > 0.0
-            && self.screen_position.x >= 0.0
-            && self.screen_position.y >= 0.0
-            && self.screen_position.x <= 2400.0
-            && self.screen_position.y <= 1080.0
+        self.depth_in_camera > 100.0
     }
     pub fn get_name<'a>(&'a self) -> &'a str {
         // 查找0x00的位置

@@ -400,7 +400,9 @@ fn world_to_screen(
     height: f32,
 ) {
     *camea = matrix[3] * obj.x + matrix[7] * obj.y + matrix[11] * obj.z + matrix[15];
-
+    if *camea <100.0 {
+        return;
+    }
     bscreen.x = width
         + (matrix[0] * obj.x + matrix[4] * obj.y + matrix[8] * obj.z + matrix[12]) / *camea * width;
     bscreen.y = height
@@ -422,7 +424,9 @@ fn world_to_screen_without_depth(
     height: f32,
 ) {
     let camea = matrix[3] * obj.x + matrix[7] * obj.y + matrix[11] * obj.z + matrix[15];
-
+    if camea < 100.0 {
+        return;
+    }
     bscreen.x = width
         + (matrix[0] * obj.x + matrix[4] * obj.y + matrix[8] * obj.z + matrix[12]) / camea * width;
     bscreen.y = height
